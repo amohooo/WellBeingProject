@@ -13,9 +13,11 @@ import java.util.Optional;
 
 public class MainMenuController{
     @FXML
-    private Button btnLogOut;
+    Button btnLogOut;
     @FXML
     Label lblName;
+    private int userId;
+    private String firstName;
     @FXML
     private void handleInternetButton(ActionEvent event) {
         switchScene(event, SceneType.INTERNET);
@@ -43,7 +45,13 @@ public class MainMenuController{
 
     public void displayName(String firstName) {
         lblName.setText(firstName + ", wish you are having a bright day!");
-        // Adjust UI based on user type
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
     public enum SceneType {
         INTERNET, REPORT, WEBE, USER_PROFILE, SETTING, CONTACT
@@ -80,6 +88,16 @@ public class MainMenuController{
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(fxmlFile));
             Parent root1 = fxmlLoader.load();
             Stage stage = new Stage();
+            // Check if the scene is INTERNET and then set the user ID
+            if (sceneType == SceneType.INTERNET) {
+                InternetExplorerController controller = fxmlLoader.getController();
+                controller.setUserId(userId);  // Pass the user ID to the InternetExplorer controller
+                controller.setFirstName(firstName);  // Pass the user ID to the InternetExplorer controller
+            }
+            if (sceneType == SceneType.WEBE) {
+                WellBeingTipsController controller = fxmlLoader.getController();
+                controller.setUserId(userId);  // Pass the user ID
+            }
             stage.setTitle(title);
             stage.setScene(new Scene(root1));
             stage.setResizable(true);
@@ -90,12 +108,42 @@ public class MainMenuController{
         }
     }
 
-    public void btnLogOutOnAction(ActionEvent e){
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Logout Confirmation");
-        alert.setHeaderText("Logging out");
-        alert.setContentText("Are you sure you want to log out?");
+//    public void btnLogOutOnAction(ActionEvent e){
+//        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+//        alert.setTitle("Logout Confirmation");
+//        alert.setHeaderText("Logging out");
+//        alert.setContentText("Are you sure you want to log out?");
+//
+//        Optional<ButtonType> result = alert.showAndWait();
+//        if (result.isPresent() && result.get() == ButtonType.OK) {
+//            try {
+//                // Close the current window
+//                Stage stage = (Stage) btnLogOut.getScene().getWindow();
+//                stage.close();
+//
+//                // Load and display the login page
+//                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/cab302/wellbeing/Login.fxml"));
+//                Parent root = loader.load();
+//                Stage loginStage = new Stage();
+//                loginStage.setTitle("Login");
+//                loginStage.setScene(new Scene(root));
+//                loginStage.show();
+//            } catch (IOException ex) {
+//                System.err.println("Error loading Login.fxml: " + ex.getMessage());
+//                ex.printStackTrace();
+//            }
+//        }
+//    }
+    protected Alert createAlert(Alert.AlertType alertType, String title, String header, String content) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        return alert;
+    }
 
+    public void btnLogOutOnAction(ActionEvent e) {
+        Alert alert = createAlert(Alert.AlertType.CONFIRMATION, "Logout Confirmation", "Logging out", "Are you sure you want to log out?");
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
@@ -115,6 +163,11 @@ public class MainMenuController{
                 ex.printStackTrace();
             }
         }
+    }
+
+    private void closeCurrentWindow() {
+        Stage stage = (Stage) btnLogOut.getScene().getWindow();
+        stage.close();
     }
 
 }

@@ -1,17 +1,15 @@
 package com.cab302.wellbeing.controller;
 
 import com.cab302.wellbeing.DataBaseConnection;
-import com.cab302.wellbeing.WellBeingApplication;
+import javafx.animation.PauseTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-import javafx.stage.Window;
-import javafx.stage.WindowEvent;
+import javafx.util.Duration;
 import org.mindrot.jbcrypt.BCrypt;
 import java.io.IOException;
 import java.sql.Connection;
@@ -22,17 +20,25 @@ import java.sql.SQLException;
 public class RegisterController {
 
     @FXML
-    private TextField txtFName, txtLName, txtUsername, txtEmail;
+    TextField txtFName;
     @FXML
-    private PasswordField ptxtPwd,  ptxtRetp;
+    TextField txtLName;
     @FXML
-    private RadioButton radbGnrl, radbAdm;
+    TextField txtUsername;
+    @FXML
+    TextField txtEmail;
+    @FXML
+    PasswordField ptxtPwd;
+    @FXML
+    PasswordField ptxtRetp;
+    @FXML
+    RadioButton radbAdm;
     @FXML
     private Button btnRgst, btnCncl;
     @FXML
-    private Label lblMsg;
+    Label lblMsg;
     @FXML
-    private CheckBox ckUser;
+    CheckBox ckUser;
 
     public void registerUser() {
         DataBaseConnection connectNow = new DataBaseConnection();
@@ -60,7 +66,9 @@ public class RegisterController {
 
             if (rowsAffected > 0) {
                 lblMsg.setText("Successfully registered.");
-                closeWindow();
+                PauseTransition delay = new PauseTransition(Duration.seconds(0.5)); // Introduce a delay before closing the window for the test purpose
+                delay.setOnFinished(event -> closeWindow());
+                delay.play();
             } else {
                 lblMsg.setText("Registration failed. Please try again.");
             }
@@ -76,7 +84,7 @@ public class RegisterController {
         stage.close();  // Closes the current window
     }
 
-    private boolean validateInputs() {
+    boolean validateInputs() {
         if (txtFName.getText().isBlank() || txtLName.getText().isBlank() || txtUsername.getText().isBlank() || ptxtPwd.getText().isBlank() || txtEmail.getText().isBlank() || ptxtRetp.getText().isBlank()) {
             lblMsg.setText("Please fill all the information above.");
             return false;

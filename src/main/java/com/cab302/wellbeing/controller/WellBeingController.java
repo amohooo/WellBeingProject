@@ -1,6 +1,8 @@
 package com.cab302.wellbeing.controller;
 
 import com.cab302.wellbeing.DataBaseConnection;
+import com.cab302.wellbeing.UserSession;
+import javafx.animation.PauseTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -9,6 +11,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import org.mindrot.jbcrypt.BCrypt;
 import java.io.IOException;
 import java.sql.Connection;
@@ -18,26 +21,31 @@ import java.sql.SQLException;
 
 public class WellBeingController {
     @FXML
-    private Button btnExit, btnLogOut, btnRegst;
+    Button btnExit;
     @FXML
-    private TextField txtUsr;
+    Button btnLogOut;
     @FXML
-    private PasswordField txtPwd;
+    Button btnRegst;
     @FXML
-    private Label lblLoginMsg;
+    TextField txtUsr;
+    @FXML
+    PasswordField txtPwd;
+    @FXML
+    Label lblLoginMsg;
 
     private Parent root;
     private Scene scene;
-    private Stage stage;
+    Stage stage;
 
-    private void switchToMainMenuScene(ActionEvent e, String firstName, String accType) {
+    private void switchToMainMenuScene(ActionEvent e, String firstName, String accType, int userId) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/cab302/wellbeing/MainMenu.fxml"));
             root = loader.load();
 
             MainMenuController mainMenuController = loader.getController();
             mainMenuController.displayName(firstName);
-//            mainMenuController.setAccountType(accType); // Set visibility of btnRegst based on account type
+            mainMenuController.setFirstName(firstName);
+            mainMenuController.setUserId(userId);
 
             scene = new Scene(root);
             stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
@@ -49,7 +57,6 @@ public class WellBeingController {
             ex.printStackTrace();
         }
     }
-
     public void btnExitOnAction(ActionEvent e) {
         Stage stage = (Stage) btnExit.getScene().getWindow();
         stage.close();
@@ -66,7 +73,6 @@ public class WellBeingController {
             validateLogin(e);
         }
     }
-
     public void validateLogin(ActionEvent e) {
         DataBaseConnection connectNow = new DataBaseConnection();
         Connection connectDB = connectNow.getConnection();
@@ -74,8 +80,8 @@ public class WellBeingController {
         String username = txtUsr.getText();
         String password = txtPwd.getText();  // This is the plaintext password entered by the user
 
-        // Query to retrieve the hashed password and account type from the database for the given username
-        String fetchUserDetails = "SELECT passwordHash, AccType, firstName FROM useraccount WHERE UserName = ?";
+        // Query to retrieve the user ID, hashed password, account type, and first name from the database for the given username
+        String fetchUserDetails = "SELECT userId, passwordHash, AccType, firstName FROM useraccount WHERE UserName = ?";
 
         try {
             PreparedStatement preparedStatement = connectDB.prepareStatement(fetchUserDetails);
@@ -84,6 +90,7 @@ public class WellBeingController {
             ResultSet queryResult = preparedStatement.executeQuery();
 
             if (queryResult.next()) {
+                int userId = queryResult.getInt("userId");  // Retrieve user ID
                 String storedHash = queryResult.getString("passwordHash"); // Retrieved hashed password
                 String accType = queryResult.getString("AccType");         // Account type
                 String firstName = queryResult.getString("firstName");
@@ -91,7 +98,13 @@ public class WellBeingController {
                 // Use BCrypt to check if the entered password matches the hashed password
                 if (BCrypt.checkpw(password, storedHash)) {
                     lblLoginMsg.setText("Welcome " + firstName);
-                    switchToMainMenuScene(e, firstName, accType); // Pass the account type
+                    ;
+                    // Set the current user ID in the UserSession
+                    UserSession.getInstance().setCurrentUserId(userId);
+                    PauseTransition delay = new PauseTransition(Duration.seconds(0.5)); // Introduce a delay before closing the window for the test purpose
+                    delay.setOnFinished(event -> switchToMainMenuScene(e, firstName, accType, userId));
+                    delay.play();
+
                 } else {
                     lblLoginMsg.setText("Your username or password is wrong");
                 }

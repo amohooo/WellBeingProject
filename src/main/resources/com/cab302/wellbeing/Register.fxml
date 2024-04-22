@@ -6,36 +6,89 @@
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.text.Font?>
 
 <BorderPane prefHeight="550.0" prefWidth="752.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cab302.wellbeing.controller.RegisterController">
    <center>
-      <AnchorPane prefHeight="413.0" prefWidth="752.0" BorderPane.alignment="CENTER">
+      <AnchorPane prefHeight="535.0" prefWidth="752.0" style="-fx-background-color: #009ee0;" BorderPane.alignment="CENTER">
          <children>
-            <Label layoutX="280.0" layoutY="140.0" text="First Name:" />
-            <Label layoutX="281.0" layoutY="178.0" text="Last Name:" />
-            <Label layoutX="282.0" layoutY="66.0" text="User Name:" />
-            <Label layoutX="284.0" layoutY="216.0" text="Password:" />
-            <Label layoutX="244.0" layoutY="286.0" text="Account Type:" />
-            <TextField fx:id="txtFName" layoutX="350.0" layoutY="136.0" promptText="First Name" />
-            <TextField fx:id="txtLName" layoutX="350.0" layoutY="174.0" promptText="Last Name" />
-            <TextField fx:id="txtUsername" layoutX="350.0" layoutY="62.0" promptText="Username" />
-            <Button fx:id="btnRgst" layoutX="580.0" layoutY="349.0" mnemonicParsing="false" onAction="#setBtnRgst" text="Register" />
-            <Button fx:id="btnCncl" layoutX="658.0" layoutY="349.0" mnemonicParsing="false" onAction="#setBtnCncl" text="Cancel" />
-            <RadioButton fx:id="radbAdm" layoutX="333.0" layoutY="286.0" mnemonicParsing="false" text="Admin" />
+            <Label layoutX="250.0" layoutY="251.0" text="First Name:" textFill="WHITE">
+               <font>
+                  <Font name="Segoe Print Bold" size="14.0" />
+               </font></Label>
+            <Label layoutX="252.0" layoutY="289.0" text="Last Name:" textFill="WHITE">
+               <font>
+                  <Font name="Segoe Print Bold" size="14.0" />
+               </font></Label>
+            <Label layoutX="251.0" layoutY="177.0" text="User Name:" textFill="WHITE">
+               <font>
+                  <Font name="Segoe Print Bold" size="14.0" />
+               </font></Label>
+            <Label layoutX="256.0" layoutY="327.0" text="Password:" textFill="WHITE">
+               <font>
+                  <Font name="Segoe Print Bold" size="14.0" />
+               </font></Label>
+            <Label layoutX="223.0" layoutY="401.0" text="Account Type:" textFill="WHITE">
+               <font>
+                  <Font name="Segoe Print Bold" size="14.0" />
+               </font></Label>
+            <TextField fx:id="txtFName" layoutX="335.0" layoutY="251.0" promptText="First Name" />
+            <TextField fx:id="txtLName" layoutX="335.0" layoutY="289.0" promptText="Last Name" />
+            <TextField fx:id="txtUsername" layoutX="335.0" layoutY="177.0" promptText="Username" />
+            <Button fx:id="btnRgst" layoutX="539.0" layoutY="467.0" mnemonicParsing="false" onAction="#setBtnRgst" style="-fx-background-color: transparent;" text="Register" textFill="WHITE">
+               <font>
+                  <Font name="Segoe Print Bold" size="14.0" />
+               </font>
+               <effect>
+                  <DropShadow />
+               </effect></Button>
+            <Button fx:id="btnCncl" layoutX="638.0" layoutY="467.0" mnemonicParsing="false" onAction="#setBtnCncl" style="-fx-background-color: transparent;" text="Cancel" textFill="WHITE">
+               <font>
+                  <Font name="Segoe Print Bold" size="14.0" />
+               </font>
+               <effect>
+                  <DropShadow />
+               </effect></Button>
+            <RadioButton fx:id="radbAdm" layoutX="340.0" layoutY="401.0" mnemonicParsing="false" text="Admin" textFill="WHITE">
+               <font>
+                  <Font name="Segoe Print Bold" size="14.0" />
+               </font></RadioButton>
             <Label fx:id="lblMsg" layoutX="285.0" layoutY="24.0" prefHeight="28.0" prefWidth="353.0" />
-            <Label layoutX="295.0" layoutY="103.0" text="Email:" />
-            <TextField fx:id="txtEmail" layoutX="350.0" layoutY="99.0" promptText="Email address" />
-            <Label layoutX="246.0" layoutY="253.0" text="Re-type password:" />
-            <PasswordField fx:id="ptxtPwd" layoutX="350.0" layoutY="212.0" promptText="Password" />
-            <PasswordField fx:id="ptxtRetp" layoutX="350.0" layoutY="249.0" promptText="Re-type in password" />
-            <CheckBox fx:id="ckUser" layoutX="333.0" layoutY="317.0" mnemonicParsing="false" />
-            <Button fx:id="btnUser" layoutX="350.0" layoutY="313.0" mnemonicParsing="false" onAction="#switchToUserAgreementScene" prefHeight="25.0" prefWidth="103.0" style="-fx-background-color: transparent;" text="User Agreement" />
+            <Label layoutX="270.0" layoutY="214.0" text="Email:" textFill="WHITE">
+               <font>
+                  <Font name="Segoe Print Bold" size="14.0" />
+               </font></Label>
+            <TextField fx:id="txtEmail" layoutX="335.0" layoutY="214.0" promptText="Email address" />
+            <Label layoutX="190.0" layoutY="364.0" text="Re-type password:" textFill="WHITE">
+               <font>
+                  <Font name="Segoe Print Bold" size="14.0" />
+               </font></Label>
+            <PasswordField fx:id="ptxtPwd" layoutX="335.0" layoutY="327.0" promptText="Password" />
+            <PasswordField fx:id="ptxtRetp" layoutX="335.0" layoutY="364.0" promptText="Re-type in password" />
+            <CheckBox fx:id="ckUser" layoutX="346.0" layoutY="441.0" mnemonicParsing="false" />
+            <Button fx:id="btnUser" layoutX="362.0" layoutY="432.0" mnemonicParsing="false" onAction="#switchToUserAgreementScene" prefHeight="35.0" prefWidth="137.0" style="-fx-background-color: transparent;" text="User Agreement" textFill="WHITE">
+               <font>
+                  <Font name="Segoe Print Bold" size="14.0" />
+               </font></Button>
+            <ImageView fitHeight="106.0" fitWidth="124.0" layoutX="40.0" layoutY="24.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@image/physical-wellbeing.png" />
+               </image>
+            </ImageView>
+            <Label layoutX="260.0" layoutY="44.0" prefHeight="117.0" prefWidth="313.0" text="Register" textFill="WHITE">
+               <font>
+                  <Font name="Segoe Print Bold" size="67.0" />
+               </font>
+               <effect>
+                  <DropShadow />
+               </effect>
+            </Label>
          </children>
       </AnchorPane>
    </center>
-   <top>
-      <AnchorPane prefHeight="147.0" prefWidth="752.0" BorderPane.alignment="CENTER" />
-   </top>
 </BorderPane>

@@ -5,18 +5,17 @@ import org.mindrot.jbcrypt.BCrypt;
 
 public class DataBaseConnection {
 
-    public Connection databaseLink;
-    private void createDatabase() {
-        // Connection details
-        String url = "jdbc:mysql://127.0.0.1:3306/"; // No database specified here
-        String databaseUser = "cab302";
-        String databasePassword = "cab302";
+    private static final String DATABASE_URL = "jdbc:mysql://127.0.0.1:3306/";
+    private static final String DATABASE_NAME = "WellBeing";
+    private static final String DATABASE_USER = "cab302";
+    private static final String DATABASE_PASSWORD = "cab302";
+    Connection databaseLink;
 
-        try (Connection conn = DriverManager.getConnection(url, databaseUser, databasePassword);
+    public void createDatabase() {
+        try (Connection conn = DriverManager.getConnection(DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD);
              Statement stmt = conn.createStatement()) {
-            // SQL statement to create the database if it does not exist
-            stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS WellBeing");
-            System.out.println("Database 'WellBeing' created or already exists.");
+            stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS " + DATABASE_NAME);
+            System.out.println("Database '" + DATABASE_NAME + "' created or already exists.");
         } catch (SQLException e) {
             System.err.println("Error creating database: " + e.getMessage());
             throw new RuntimeException("Error creating database", e);
@@ -24,82 +23,91 @@ public class DataBaseConnection {
     }
 
     public Connection getConnection() {
-        if (databaseLink != null) {
-            return databaseLink; // Use existing connection if already established
-        }
-
         try {
-            createDatabase(); // Ensure the database is created first
-
-            String databaseName = "WellBeing"; // Ensure this matches exactly with the database name in MySQL
-            String databaseUser = "cab302";
-            String databasePassword = "cab302";
-            String url = "jdbc:mysql://127.0.0.1:3306/" + databaseName;
-
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            databaseLink = DriverManager.getConnection(url, databaseUser, databasePassword);
-            System.out.println("Connected to database successfully.");
-        } catch (ClassNotFoundException e) {
-            System.err.println("MySQL driver not found: " + e.getMessage());
-            return null; // Return null if the driver class is not found
+            if (databaseLink == null || databaseLink.isClosed() || !databaseLink.isValid(5)) {
+                createDatabase(); // Ensure the database is created first
+                databaseLink = DriverManager.getConnection(DATABASE_URL + DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
+                System.out.println("Connected to database successfully.");
+            }
         } catch (SQLException e) {
             System.err.println("Failed to connect to the database: " + e.getMessage());
-            return null; // Return null if connection failed
         }
-
         return databaseLink;
     }
-    private void createTables() {
-        try (Statement statement = databaseLink.createStatement()) {
-            // Existing tables
-            String createUserAccountTableQuery = "CREATE TABLE IF NOT EXISTS useraccount ( "
-                    + "userId INTEGER PRIMARY KEY AUTO_INCREMENT, "
-                    + "userName VARCHAR(255) UNIQUE NOT NULL, "
-                    + "emailAddress VARCHAR(255) UNIQUE NOT NULL CHECK (emailAddress LIKE '%@%'), "
-                    + "firstName VARCHAR(255) NOT NULL, "
-                    + "lastName VARCHAR(255) NOT NULL, "
-                    + "passwordHash VARCHAR(255) NOT NULL, "
-                    + "accType ENUM('Admin', 'General') NOT NULL, "
-                    + "DateCreated DATETIME DEFAULT CURRENT_TIMESTAMP"
-                    + ")";
-            statement.executeUpdate(createUserAccountTableQuery);
 
-            String createBrowsingDataQuery = "CREATE TABLE IF NOT EXISTS BrowsingData ("
-                    + "BrowsingID INT AUTO_INCREMENT PRIMARY KEY, "
-                    + "UserID INT NOT NULL, "
-                    + "URL VARCHAR(2048) NOT NULL, "
-                    + "StartTime DATETIME NOT NULL, "
-                    + "EndTime DATETIME NOT NULL, "
-                    + "SessionDate DATE NOT NULL, "
-                    + "Duration INT AS (TIMESTAMPDIFF(MINUTE, StartTime, EndTime)), "
-                    + "FOREIGN KEY (UserID) REFERENCES useraccount(userId)"
-                    + ")";
-            statement.executeUpdate(createBrowsingDataQuery);
-
-            String createLimitsTableQuery = "CREATE TABLE IF NOT EXISTS Limits ("
-                    + "LimitID INT AUTO_INCREMENT PRIMARY KEY, "
-                    + "UserID INT NOT NULL, "
-                    + "LimitType VARCHAR(50) NOT NULL, "
-                    + "LimitValue INT NOT NULL, "
-                    + "Active BOOLEAN NOT NULL DEFAULT TRUE, "
-                    + "FOREIGN KEY (UserID) REFERENCES useraccount(userId)"
-                    + ")";
-            statement.executeUpdate(createLimitsTableQuery);
-
-            String createNotificationsTableQuery = "CREATE TABLE IF NOT EXISTS Notifications ("
-                    + "NotificationID INT AUTO_INCREMENT PRIMARY KEY, "
-                    + "UserID INT NOT NULL, "
-                    + "NotificationType VARCHAR(50) NOT NULL, "
-                    + "Message TEXT NOT NULL, "
-                    + "DateSent DATETIME DEFAULT CURRENT_TIMESTAMP, "
-                    + "IsRead BOOLEAN NOT NULL DEFAULT FALSE, "
-                    + "FOREIGN KEY (UserID) REFERENCES useraccount(userId)"
-                    + ")";
-            statement.executeUpdate(createNotificationsTableQuery);
-
+    public void createTables() {
+        try (Statement statement = getConnection().createStatement()) {
+            executeTableCreation(statement);
         } catch (SQLException e) {
+            System.err.println("Error creating tables: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+    private void executeTableCreation(Statement statement) throws SQLException {
+        // Existing tables
+        String createUserAccountTableQuery = "CREATE TABLE IF NOT EXISTS useraccount ( "
+                + "userId INTEGER PRIMARY KEY AUTO_INCREMENT, "
+                + "userName VARCHAR(255) UNIQUE NOT NULL, "
+                + "emailAddress VARCHAR(255) UNIQUE NOT NULL CHECK (emailAddress LIKE '%@%'), "
+                + "firstName VARCHAR(255) NOT NULL, "
+                + "lastName VARCHAR(255) NOT NULL, "
+                + "passwordHash VARCHAR(255) NOT NULL, "
+                + "accType ENUM('Admin', 'General') NOT NULL, "
+                + "DateCreated DATETIME DEFAULT CURRENT_TIMESTAMP"
+                + ")";
+        statement.executeUpdate(createUserAccountTableQuery);
+
+        String createBrowsingDataQuery = "CREATE TABLE IF NOT EXISTS BrowsingData ("
+                + "BrowsingID INT AUTO_INCREMENT PRIMARY KEY, "
+                + "UserID INT NOT NULL, "
+                + "URL VARCHAR(2048) NOT NULL, "
+                + "StartTime DATETIME NOT NULL, "
+                + "EndTime DATETIME NOT NULL, "
+                + "SessionDate DATE NOT NULL, "
+                + "Duration INT AS (TIMESTAMPDIFF(SECOND, StartTime, EndTime)), "
+                + "FOREIGN KEY (UserID) REFERENCES useraccount(userId)"
+                + ")";
+        statement.executeUpdate(createBrowsingDataQuery);
+
+        String createLimitsTableQuery = "CREATE TABLE IF NOT EXISTS Limits ("
+                + "LimitID INT AUTO_INCREMENT PRIMARY KEY, "
+                + "UserID INT NOT NULL, "
+                + "LimitType VARCHAR(50) NOT NULL, "
+                + "LimitValue INT NOT NULL, "
+                + "Active BOOLEAN NOT NULL DEFAULT TRUE, "
+                + "FOREIGN KEY (UserID) REFERENCES useraccount(userId)"
+                + ")";
+        statement.executeUpdate(createLimitsTableQuery);
+
+        String createNotificationsTableQuery = "CREATE TABLE IF NOT EXISTS Notifications ("
+                + "NotificationID INT AUTO_INCREMENT PRIMARY KEY, "
+                + "UserID INT NOT NULL, "
+                + "NotificationType VARCHAR(50) NOT NULL, "
+                + "Message TEXT NOT NULL, "
+                + "DateSent DATETIME DEFAULT CURRENT_TIMESTAMP, "
+                + "IsRead BOOLEAN NOT NULL DEFAULT FALSE, "
+                + "FOREIGN KEY (UserID) REFERENCES useraccount(userId)"
+                + ")";
+        statement.executeUpdate(createNotificationsTableQuery);
+
+        createMediaFilesTable(statement);
+
+    }
+    private void createMediaFilesTable(Statement statement) throws SQLException {
+        String createMediaFilesTableQuery = "CREATE TABLE IF NOT EXISTS MediaFiles ("
+                + "FileID INT AUTO_INCREMENT PRIMARY KEY, "
+                + "UserID INT NOT NULL, "
+                + "FileName VARCHAR(255) NOT NULL, "
+                + "FilePath VARCHAR(1024) NOT NULL, "
+                + "MediaType ENUM('Video', 'Audio') NOT NULL, "
+                + "FileSize BIGINT NOT NULL, "
+                + "UploadDate DATETIME DEFAULT CURRENT_TIMESTAMP, "
+                + "IsPublic BOOLEAN NOT NULL DEFAULT FALSE, "
+                + "IsDeleted BOOLEAN NOT NULL DEFAULT FALSE, "
+                + "Comments VARCHAR(1024), "
+                + "FOREIGN KEY (UserID) REFERENCES useraccount(userId)"
+                + ")";
+        statement.executeUpdate(createMediaFilesTableQuery);
     }
     private void insertUser() {
         String userName = "cab302";

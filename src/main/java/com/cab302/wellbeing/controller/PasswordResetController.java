@@ -1,6 +1,7 @@
 package com.cab302.wellbeing.controller;
 
 import com.cab302.wellbeing.DataBaseConnection;
+import javafx.animation.PauseTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -8,6 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.PasswordField;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import org.mindrot.jbcrypt.BCrypt;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,13 +17,17 @@ import java.sql.ResultSet;
 
 public class PasswordResetController {
     @FXML
-    private TextField txtEmailAdd;
+    TextField txtEmailAdd;
     @FXML
-    private PasswordField ptxtPwd, ptxtRePwd;
+    PasswordField ptxtPwd;
     @FXML
-    private Label lblMsg;
+    PasswordField ptxtRePwd;
     @FXML
-    private Button btnReset, btnCncl;
+    Label lblMsg;
+    @FXML
+    Button btnReset;
+    @FXML
+    Button btnCncl;
 
     public void resetPassword() {
         String email = txtEmailAdd.getText();
@@ -45,7 +51,6 @@ public class PasswordResetController {
                 return;
             }
 
-            // Assuming the reset process is accepted, update the password
             String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
             String query = "UPDATE useraccount SET passwordHash = ? WHERE emailAddress = ?";
             PreparedStatement pst = connectDB.prepareStatement(query);
@@ -55,7 +60,10 @@ public class PasswordResetController {
 
             if (result > 0) {
                 lblMsg.setText("Password successfully reset. Check your email for the confirmation link.");
-                closeWindow();
+                // Introduce a delay before closing the window
+                PauseTransition delay = new PauseTransition(Duration.seconds(0.5));
+                delay.setOnFinished(event -> closeWindow());
+                delay.play();
             } else {
                 lblMsg.setText("Failed to reset password.");
             }
@@ -89,6 +97,5 @@ public class PasswordResetController {
     public void btnExitOnAction(ActionEvent e) {
         closeWindow();
     }
+
 }
-
-

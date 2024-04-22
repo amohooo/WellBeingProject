@@ -37,7 +37,6 @@ public class SettingController {
                 System.err.println("Unsupported scene type: " + sceneType);
                 return;
         }
-
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(fxmlFile));
             Parent root1 = fxmlLoader.load();

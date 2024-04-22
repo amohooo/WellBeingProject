@@ -8,26 +8,56 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.io.IOException;
 
+/**
+ * This class is a controller for the WellBeing Tips functionality in the application.
+ * It provides methods to handle button clicks and switch scenes.
+ */
 public class WellBeingTipsController {
+
+    /**
+     * This method is used to handle the video button click event.
+     * It switches the scene to the video scene.
+     * @param event - the action event that triggered the method
+     */
     @FXML
     private void handleVideoButton(ActionEvent event) {
-        switchScene(event, WellBeingTipsController.SceneType.VIDEO);
+        switchScene(event, WellBeingTipsController.SceneType.MEDIA);
     }
+
+    /**
+     * This method is used to handle the other tip button click event.
+     * It switches the scene to the other tip scene.
+     * @param event - the action event that triggered the method
+     */
     @FXML
     private void handleOtherTipButton(ActionEvent event) {
         switchScene(event, WellBeingTipsController.SceneType.OTHERTIP);
     }
 
+    /**
+     * This enum is used to define the types of scenes that can be switched to.
+     */
     public enum SceneType {
-        VIDEO, OTHERTIP
+        MEDIA, OTHERTIP
     }
+    private int userId;
+    public void setUserId(int userId) {
+        this.userId = userId;  // Now you can use this userId to store browsing data linked to the user
+    }
+
+    /**
+     * This method is used to switch the scene based on the specified scene type.
+     * It loads the fxml file for the scene and displays it in a new window.
+     * @param event - the action event that triggered the method
+     * @param sceneType - the type of scene to switch to
+     */
     public void switchScene(ActionEvent event, WellBeingTipsController.SceneType sceneType) {
         String fxmlFile = "";
-        String title = "TIPS";  // Assuming a common title for simplicity, can be adjusted if needed
+        String title = "TIPS";
 
         switch (sceneType) {
-            case VIDEO:
-                fxmlFile = "/com/cab302/wellbeing/Video.fxml";
+            case MEDIA:
+                fxmlFile = "/com/cab302/wellbeing/Media.fxml";
                 break;
             case OTHERTIP:
                 fxmlFile = "/com/cab302/wellbeing/OtherTips.fxml";
@@ -41,6 +71,10 @@ public class WellBeingTipsController {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(fxmlFile));
             Parent root1 = fxmlLoader.load();
             Stage stage = new Stage();
+            if (sceneType == SceneType.MEDIA) {
+                MediaController controller = fxmlLoader.getController();
+                controller.setUserId(userId);  // Pass the user ID to the InternetExplorer controller
+            }
             stage.setTitle(title);
             stage.setScene(new Scene(root1));
             stage.setResizable(true);
