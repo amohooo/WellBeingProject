@@ -45,7 +45,6 @@ public class PasswordResetController {
                 return;
             }
 
-            // Assuming the reset process is accepted, update the password
             String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
             String query = "UPDATE useraccount SET passwordHash = ? WHERE emailAddress = ?";
             PreparedStatement pst = connectDB.prepareStatement(query);
@@ -90,5 +89,3 @@ public class PasswordResetController {
         closeWindow();
     }
 }
-
-

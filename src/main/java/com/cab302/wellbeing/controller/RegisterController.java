@@ -1,17 +1,13 @@
 package com.cab302.wellbeing.controller;
 
 import com.cab302.wellbeing.DataBaseConnection;
-import com.cab302.wellbeing.WellBeingApplication;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-import javafx.stage.Window;
-import javafx.stage.WindowEvent;
 import org.mindrot.jbcrypt.BCrypt;
 import java.io.IOException;
 import java.sql.Connection;
@@ -26,7 +22,7 @@ public class RegisterController {
     @FXML
     private PasswordField ptxtPwd,  ptxtRetp;
     @FXML
-    private RadioButton radbGnrl, radbAdm;
+    RadioButton radbAdm;
     @FXML
     private Button btnRgst, btnCncl;
     @FXML

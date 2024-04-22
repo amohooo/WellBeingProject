@@ -6,7 +6,7 @@ import org.mindrot.jbcrypt.BCrypt;
 public class DataBaseConnection {
 
     public Connection databaseLink;
-    private void createDatabase() {
+    public void createDatabase() {
         // Connection details
         String url = "jdbc:mysql://127.0.0.1:3306/"; // No database specified here
         String databaseUser = "cab302";
@@ -24,12 +24,12 @@ public class DataBaseConnection {
     }
 
     public Connection getConnection() {
-        if (databaseLink != null) {
-            return databaseLink; // Use existing connection if already established
-        }
-
         try {
-            createDatabase(); // Ensure the database is created first
+            if (databaseLink != null && !databaseLink.isClosed() && databaseLink.isValid(5)) {  // Check if connection is valid with a 5-second timeout
+                return databaseLink;
+            }
+            // If the existing connection is null, closed, or not valid, establish a new one
+            createDatabase();  // Ensure the database is created first
 
             String databaseName = "WellBeing"; // Ensure this matches exactly with the database name in MySQL
             String databaseUser = "cab302";
@@ -41,12 +41,11 @@ public class DataBaseConnection {
             System.out.println("Connected to database successfully.");
         } catch (ClassNotFoundException e) {
             System.err.println("MySQL driver not found: " + e.getMessage());
-            return null; // Return null if the driver class is not found
+            return null;  // Return null if the driver class is not found
         } catch (SQLException e) {
             System.err.println("Failed to connect to the database: " + e.getMessage());
-            return null; // Return null if connection failed
+            return null;  // Return null if connection failed
         }
-
         return databaseLink;
     }
     private void createTables() {
@@ -71,7 +70,7 @@ public class DataBaseConnection {
                     + "StartTime DATETIME NOT NULL, "
                     + "EndTime DATETIME NOT NULL, "
                     + "SessionDate DATE NOT NULL, "
-                    + "Duration INT AS (TIMESTAMPDIFF(MINUTE, StartTime, EndTime)), "
+                    + "Duration INT AS (TIMESTAMPDIFF(SECOND, StartTime, EndTime)), "
                     + "FOREIGN KEY (UserID) REFERENCES useraccount(userId)"
                     + ")";
             statement.executeUpdate(createBrowsingDataQuery);

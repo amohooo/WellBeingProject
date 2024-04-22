@@ -5,6 +5,7 @@ module com.cab302.wellbeing {
     requires javafx.web;
     requires java.desktop;
     requires jbcrypt;
+    requires javafx.media;
 
     opens com.cab302.wellbeing to javafx.fxml;
     exports com.cab302.wellbeing;

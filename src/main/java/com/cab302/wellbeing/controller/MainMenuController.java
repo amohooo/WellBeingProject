@@ -16,6 +16,7 @@ public class MainMenuController{
     private Button btnLogOut;
     @FXML
     Label lblName;
+    private int userId;
     @FXML
     private void handleInternetButton(ActionEvent event) {
         switchScene(event, SceneType.INTERNET);
@@ -43,8 +44,12 @@ public class MainMenuController{
 
     public void displayName(String firstName) {
         lblName.setText(firstName + ", wish you are having a bright day!");
-        // Adjust UI based on user type
     }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
     public enum SceneType {
         INTERNET, REPORT, WEBE, USER_PROFILE, SETTING, CONTACT
     }
@@ -80,6 +85,11 @@ public class MainMenuController{
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(fxmlFile));
             Parent root1 = fxmlLoader.load();
             Stage stage = new Stage();
+            // Check if the scene is INTERNET and then set the user ID
+            if (sceneType == SceneType.INTERNET) {
+                InternetExplorer controller = fxmlLoader.getController();
+                controller.setUserId(userId);  // Pass the user ID to the InternetExplorer controller
+            }
             stage.setTitle(title);
             stage.setScene(new Scene(root1));
             stage.setResizable(true);

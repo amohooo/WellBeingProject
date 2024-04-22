@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import java.io.IOException;
 
@@ -27,7 +28,7 @@ public class WellBeingTipsController {
 
         switch (sceneType) {
             case VIDEO:
-                fxmlFile = "/com/cab302/wellbeing/Video.fxml";
+                fxmlFile = "/com/cab302/wellbeing/Media.fxml";
                 break;
             case OTHERTIP:
                 fxmlFile = "/com/cab302/wellbeing/OtherTips.fxml";
@@ -44,6 +45,7 @@ public class WellBeingTipsController {
             stage.setTitle(title);
             stage.setScene(new Scene(root1));
             stage.setResizable(true);
+            stage.getIcons().add(new Image("com/cab302/wellbeing/image/physical-wellbeing.png"));
             stage.show();
         } catch (IOException e) {
             System.err.println("Error loading " + fxmlFile + ": " + e.getMessage());
