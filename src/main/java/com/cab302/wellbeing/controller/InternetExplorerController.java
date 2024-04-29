@@ -32,7 +32,7 @@ public class InternetExplorerController implements Initializable {
     @FXML
     WebView webView;
     @FXML
-    TextField txtAddr;
+    public TextField txtAddr;
     @FXML
     Button btnRfrsh;
     @FXML

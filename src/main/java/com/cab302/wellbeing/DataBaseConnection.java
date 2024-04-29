@@ -15,7 +15,7 @@ public class DataBaseConnection {
     private static final String DATABASE_NAME = "WellBeing";
     private static final String DATABASE_USER = "cab302";
     private static final String DATABASE_PASSWORD = "cab302";
-    Connection databaseLink;
+    public Connection databaseLink;
 
     public void createDatabase() {
         try (Connection conn = DriverManager.getConnection(DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD);

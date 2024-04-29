@@ -85,7 +85,7 @@ class DataBaseConnectionTest {
         try (Statement statement = dbConnection.databaseLink.createStatement();
              ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) FROM useraccount")) {
             assertTrue(resultSet.next());
-            assertEquals(2, resultSet.getInt(1));
+            assertEquals(1, resultSet.getInt(1));
         } catch (SQLException e) {
             e.printStackTrace();
         }

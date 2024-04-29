@@ -11,15 +11,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import com.cab302.wellbeing.DataBaseConnection;
+import javafx.scene.input.KeyCode;
 import javafx.util.Duration;
 
 public class BrowsingHistoryController {
     @FXML
-    DatePicker startDatePicker;
+    public DatePicker startDatePicker;
     @FXML
-    DatePicker endDatePicker;
+    public DatePicker endDatePicker;
     @FXML
-    TextArea historyDisplayArea;
+    public TextArea historyDisplayArea;
     @FXML
     Button btnLoadHistory;
     @FXML
@@ -30,8 +31,14 @@ public class BrowsingHistoryController {
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
-    public void setHistoryDisplayArea(TextArea historyDisplayArea) {
-        this.historyDisplayArea = historyDisplayArea;
+
+    public void initialize() {
+        // Set up the event handler for the Enter key in the txtUrl TextField
+        txtUrl.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                loadHistory();  // Call your method to load or search the history
+            }
+        });
     }
     public void loadHistory() {
         historyDisplayArea.clear();
