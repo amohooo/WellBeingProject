@@ -7,7 +7,6 @@ import static org.mockito.Mockito.*;
 import com.cab302.wellbeing.DataBaseConnection;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.embed.swing.JFXPanel;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
