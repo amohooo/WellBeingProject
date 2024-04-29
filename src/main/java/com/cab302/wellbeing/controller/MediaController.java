@@ -14,102 +14,157 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
+import javafx.animation.PauseTransition;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class MediaController implements Initializable {
-
+    private int userId;
+    public void setUserId(int userId) {
+        this.userId = userId;  // Now you can use this userId to store browsing data linked to the user
+    }
     @FXML private MediaView mediaView;
-    @FXML private Button btnPlay, btnPause, btnStop;
+    @FXML private Button btnPlay, btnPause, btnStop, btnLoad, btnUpload;
     @FXML private Label lblDuration;
     @FXML private Slider slider;
-
+    @FXML
+    ChoiceBox<String> chbMedia;
     private Media media;
-    private MediaPlayer mediaPlayer;
+    MediaPlayer mediaPlayer;
     private boolean isPlayed = false;
-    private int userID;
+
     private DataBaseConnection dbConnection;
 
+    private void setupMediaPlayer(String filePath) {
+        File mediaFile = new File(filePath);
+        if (!mediaFile.exists()) {
+            System.err.println("File does not exist: " + filePath);
+            return;
+        }
+        String uriString = mediaFile.toURI().toString();
+        System.out.println("URI for media: " + uriString);
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+        }
+        media = new Media(uriString);
+        mediaPlayer = new MediaPlayer(media);
+        mediaView.setMediaPlayer(mediaPlayer);
+        bindMediaPlayer();
+    }
     @FXML
     private void selectMedia() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select Media");
         File file = fileChooser.showOpenDialog(null);
         if (file != null) {
-            setupMediaPlayer(file.toURI().toString());
+            setupMediaPlayer(file.getAbsolutePath());
         } else {
             setupMediaPlayer("src/main/resources/com/cab302/wellbeing/Media/Mental_Wellbeing.mp4");
         }
     }
-
-    private void setupMediaPlayer(String mediaPath) {
-        File mediaFile = new File(mediaPath);
-        String uriString = mediaFile.toURI().toString();  // Converts the file path to a URI string with the 'file:' scheme
-        if (mediaPlayer != null) {
-            mediaPlayer.stop();
-        }
-        media = new Media(uriString);  // Use the URI string here
-        mediaPlayer = new MediaPlayer(media);
-        mediaView.setMediaPlayer(mediaPlayer);
-        bindMediaPlayer();
-    }
-
     private void bindMediaPlayer() {
-        mediaPlayer.currentTimeProperty().addListener((observableValue, oldValue, newValue) -> {
+        mediaPlayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
             slider.setValue(newValue.toSeconds());
-            lblDuration.setText("Duration: " + (int)slider.getValue() + " / " + (int)media.getDuration().toSeconds());
+            lblDuration.setText(formatDuration(newValue) + " / " + formatDuration(media.getDuration()));
         });
         mediaPlayer.setOnReady(() -> {
             Duration duration = media.getDuration();
             slider.setMax(duration.toSeconds());
-            lblDuration.setText("Duration: 00 / " + (int)media.getDuration().toSeconds());
+            lblDuration.setText("Duration: 00:00:00 / " + formatDuration(duration));
         });
         mediaPlayer.setAutoPlay(false);
     }
 
+    private String formatDuration(Duration duration) {
+        int hours = (int) duration.toHours();
+        int minutes = (int) duration.toMinutes() % 60;
+        int seconds = (int) duration.toSeconds() % 60;
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+    }
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         dbConnection = new DataBaseConnection();
-        setupMediaPlayer("src/main/resources/com/cab302/wellbeing/Media/Mental_Wellbeing.mp4");
-    }
+        setUserId(userId);
 
-    public void playMedia() {
-        if (!isPlayed) {
-            btnPlay.setText("Pause");
-            mediaPlayer.play();
-            isPlayed = true;
-        } else {
-            btnPlay.setText("Play");
-            mediaPlayer.pause();
-            isPlayed = false;
+        PauseTransition delay = new PauseTransition(Duration.seconds(0.5)); // Introduce a delay before closing the window for the test purpose
+        delay.setOnFinished(event -> loadMediaFilesToChoiceBox());
+        delay.play();
+
+        setupMediaPlayer("src/main/resources/com/cab302/wellbeing/Media/Mental_Wellbeing.mp4");
+
+        // Delay window-related setup until the MediaView is displayed
+        Platform.runLater(() -> {
+            if (mediaView.getScene() != null && mediaView.getScene().getWindow() != null) {
+                Stage stage = (Stage) mediaView.getScene().getWindow();
+                stage.setOnCloseRequest(event -> {
+                    if (mediaPlayer != null) {
+                        mediaPlayer.stop();
+                        mediaPlayer.dispose();
+                    }
+                });
+            }
+        });
+
+        chbMedia.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {
+            if (newValue != null) {
+                loadMedia(newValue);
+            }
+        });
+    }
+    private void loadMedia(String fileName) {
+        if (userId == 0) {  // Assuming userId is 0 when not set
+            System.out.println("No user ID provided");
+            return; // Exit the method if userId is not set
+        }
+        String query = "SELECT FilePath FROM MediaFiles WHERE FileName = ? AND UserID = ? AND IsDeleted = FALSE AND IsPublic = TRUE";
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, fileName);
+            pstmt.setInt(2, userId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                String filePath = rs.getString("FilePath");
+                setupMediaPlayer(filePath);
+            } else {
+                System.err.println("File path not found for selected media: " + fileName);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading selected media file: " + e.getMessage());
+            e.printStackTrace();
         }
     }
-
+    public void playMedia() {
+            mediaPlayer.play();
+    }
     public void pauseMedia() {
         mediaPlayer.pause();
     }
-
+    public void refreshMediaList() {
+        PauseTransition delay = new PauseTransition(Duration.seconds(0.5)); // Introduce a delay before closing the window for the test purpose
+        delay.setOnFinished(event -> loadMediaFilesToChoiceBox());
+        delay.play();
+        //loadMediaFilesToChoiceBox();
+    }
     public void stopMedia() {
         mediaPlayer.stop();
     }
-
     @FXML
     private void sliderPressed() {
         mediaPlayer.seek(Duration.seconds(slider.getValue()));
     }
-
-    public void setUserId(int userId) {
-        this.userID = userId;  // Now you can use this userId to store browsing data linked to the user
-    }
-
     @FXML
     private void uploadMedia() {
         FileChooser fileChooser = new FileChooser();
@@ -119,7 +174,6 @@ public class MediaController implements Initializable {
             String path = saveFileToServer(file);
         }
     }
-
     private String saveFileToServer(File file) {
         String directoryPath = "uploadMedia";  // Set your server storage path
         Path directory = Paths.get(directoryPath);
@@ -141,6 +195,41 @@ public class MediaController implements Initializable {
             System.err.println("Failed to save the file: " + e.getMessage());
             e.printStackTrace();
             return null;
+        }
+    }
+    void loadMediaFilesToChoiceBox() {
+        if (userId <= 0) {
+            return;
+        }
+        String query = "SELECT FileName FROM MediaFiles WHERE UserID = ? AND IsDeleted = FALSE AND IsPublic = TRUE";
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setInt(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+            ObservableList<String> mediaFiles = FXCollections.observableArrayList();
+            boolean foundData = false;
+            while (rs.next()) {
+                foundData = true;
+                String fileName = rs.getString("FileName");
+                mediaFiles.add(fileName);
+                System.out.println("Loaded file: " + fileName);  // Log loaded file names
+            }
+            if (!foundData) {
+                System.out.println("No files found for user with ID " + userId);
+            }
+            PauseTransition delay = new PauseTransition(Duration.seconds(0.5)); // Introduce a delay before closing the window for the test purpose
+            delay.setOnFinished(event -> chbMedia.setItems(mediaFiles));
+            delay.play();
+
+            if (!mediaFiles.isEmpty()) {
+                PauseTransition delay1 = new PauseTransition(Duration.seconds(0.5)); // Introduce a delay before closing the window for the test purpose
+                delay1.setOnFinished(event -> chbMedia.getSelectionModel().selectFirst());
+                delay1.play();
+
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading media files: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -167,12 +256,12 @@ public class MediaController implements Initializable {
         String query = "INSERT INTO MediaFiles (UserID, FileName, FilePath, MediaType, FileSize, IsPublic, IsDeleted, Comments) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = dbConnection.getConnection(); // Assuming databaseLink is a valid and open connection
              PreparedStatement pstmt = conn.prepareStatement(query)) {
-            pstmt.setInt(1, userID);
+            pstmt.setInt(1, userId);
             pstmt.setString(2, file.getName());
             pstmt.setString(3, filePath);
             pstmt.setString(4, mediaType); // Set the adjusted media type
             pstmt.setLong(5, file.length());
-            pstmt.setBoolean(6, false);  // IsPublic
+            pstmt.setBoolean(6, true);  // IsPublic
             pstmt.setBoolean(7, false);  // IsDeleted
             pstmt.setString(8, "");      // Comments
 
@@ -185,5 +274,4 @@ public class MediaController implements Initializable {
             e.printStackTrace();
         }
     }
-
 }

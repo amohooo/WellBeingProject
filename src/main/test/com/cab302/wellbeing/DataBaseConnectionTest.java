@@ -3,15 +3,27 @@ package com.cab302.wellbeing;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
 
 class DataBaseConnectionTest {
+
+    @Mock
+    private Connection mockConnection;
+
+    @Mock
+    private Statement mockStatement;
+
+    @Mock
+    private PreparedStatement mockPreparedStatement;
+
+    @Mock
+    private ResultSet mockResultSet;
     private DataBaseConnection dbConnection;
     @BeforeEach
     void setUp() {
@@ -55,7 +67,12 @@ class DataBaseConnectionTest {
             assertTrue(resultSet.next());
             assertEquals("notifications", resultSet.getString(1));
             assertTrue(resultSet.next());
+            assertEquals("pwdquestions1", resultSet.getString(1));
+            assertTrue(resultSet.next());
+            assertEquals("pwdquestions2", resultSet.getString(1));
+            assertTrue(resultSet.next());
             assertEquals("useraccount", resultSet.getString(1));
+
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -68,9 +85,10 @@ class DataBaseConnectionTest {
         try (Statement statement = dbConnection.databaseLink.createStatement();
              ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) FROM useraccount")) {
             assertTrue(resultSet.next());
-            assertEquals(3, resultSet.getInt(1));
+            assertEquals(2, resultSet.getInt(1));
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+
 }

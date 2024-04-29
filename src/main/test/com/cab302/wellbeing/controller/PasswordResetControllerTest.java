@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mindrot.jbcrypt.BCrypt;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -25,21 +26,14 @@ public class PasswordResetControllerTest {
 
     @InjectMocks
     private static PasswordResetController passwordResetController;
-
     @Mock
     private DataBaseConnection mockDataBaseConnection;
-
     @Mock
     private Connection mockConnection;
-
     @Mock
     private PreparedStatement mockPreparedStatement;
-
     @Mock
     private ResultSet mockResultSet;
-
-    @Mock
-    private Stage mockStage;
     @BeforeAll
     public static void setUpAll() {
         Platform.startup(() -> {
@@ -51,63 +45,69 @@ public class PasswordResetControllerTest {
     public void setUp() {
         MockitoAnnotations.openMocks(this);
         when(mockDataBaseConnection.getConnection()).thenReturn(mockConnection);
-        passwordResetController = spy(new PasswordResetController() {
-        });
-
+        passwordResetController = new PasswordResetController();
         passwordResetController.txtEmailAdd = new TextField();
-        passwordResetController.ptxtPwd = new PasswordField();
-        passwordResetController.ptxtRePwd = new PasswordField();
+        passwordResetController.txtAn1 = new TextField();
+        passwordResetController.txtAn2 = new TextField();
         passwordResetController.lblMsg = new Label();
+        passwordResetController.lblQ1 = new Label();
+        passwordResetController.lblQ2 = new Label();
+        passwordResetController.lblVerify = new Label();
         passwordResetController.btnReset = new Button();
         passwordResetController.btnCncl = new Button();
     }
 
     @Test
-    public void testResetPassword_AllFieldsEmpty() {
-        // Scenario: All fields are empty
-        passwordResetController.resetPassword();
-        assertEquals("Please fill in all fields.", passwordResetController.lblMsg.getText());
+    public void testDisplayQuestions_EmailNotEntered() {
+        passwordResetController.displayQuestions();
+        assertEquals("Please enter your email address.", passwordResetController.lblMsg.getText());
     }
 
     @Test
-    public void testResetPassword_PasswordsDoNotMatch() {
-        // Scenario: Passwords do not match
-        passwordResetController.txtEmailAdd.setText("user@example.com");
-        passwordResetController.ptxtPwd.setText("password123");
-        passwordResetController.ptxtRePwd.setText("password321");
-
-        passwordResetController.resetPassword();
-        assertEquals("Passwords do not match.", passwordResetController.lblMsg.getText());
-    }
-
-    @Test
-    public void testResetPassword_EmailDoesNotExist() throws Exception {
-        // Scenario: The email does not exist in the database
+    public void testDisplayQuestions_EmailNotExist() throws Exception {
+        passwordResetController.txtEmailAdd.setText("nonexistent@example.com");
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(false); // Simulate no results found
 
-        passwordResetController.txtEmailAdd.setText("nonexistent@example.com");
-        passwordResetController.ptxtPwd.setText("password123");
-        passwordResetController.ptxtRePwd.setText("password123");
-
-        passwordResetController.resetPassword();
-        assertEquals("The email does not exist. Please try again.", passwordResetController.lblMsg.getText());
+        passwordResetController.displayQuestions();
+        assertEquals("No account associated with this email.", passwordResetController.lblMsg.getText());
     }
 
     @Test
-    public void testResetPassword_SuccessfulReset() throws Exception {
-        // Scenario: Successful password reset
+    public void testVerifyAnswers_AllFieldsRequired() {
+        passwordResetController.verifyAnswers();
+        assertEquals("Please fill in all fields for verification.", passwordResetController.lblVerify.getText());
+    }
+
+    @Test
+    public void testVerifyAnswers_IncorrectAnswers() throws Exception {
+        passwordResetController.txtEmailAdd.setText("@");
+        passwordResetController.txtAn1.setText("wrongAnswer1");
+        passwordResetController.txtAn2.setText("wrongAnswer2");
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(true); // Simulate email exists
+        when(mockResultSet.getString("Answer_1")).thenReturn("$2a$10$hash");
+        when(mockResultSet.getString("Answer_2")).thenReturn("$2a$10$hash");
 
-        passwordResetController.txtEmailAdd.setText("cab302@qut.edu.au");
-        passwordResetController.ptxtPwd.setText("cab302");
-        passwordResetController.ptxtRePwd.setText("cab302");
+        passwordResetController.verifyAnswers();
+        assertEquals("Incorrect answers. Please try again.", passwordResetController.lblVerify.getText());
+    }
 
-        passwordResetController.resetPassword();
-        assertEquals("Password successfully reset. Check your email for the confirmation link.", passwordResetController.lblMsg.getText());
+    @Test
+    public void testVerifyAnswers_CorrectAnswers() throws Exception {
+        passwordResetController.txtEmailAdd.setText("@");
+        passwordResetController.txtAn1.setText("1");
+        passwordResetController.txtAn2.setText("1");
+        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        when(mockResultSet.next()).thenReturn(true); // Simulate email exists
+        when(mockResultSet.getString("Answer_1")).thenReturn(BCrypt.hashpw("1", BCrypt.gensalt()));
+        when(mockResultSet.getString("Answer_2")).thenReturn(BCrypt.hashpw("1", BCrypt.gensalt()));
+
+        passwordResetController.verifyAnswers();
+        assertEquals("Your answers are correct. You can now reset your password.", passwordResetController.lblVerify.getText());
+        assertFalse(passwordResetController.btnReset.isDisabled());
     }
 }

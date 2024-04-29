@@ -7,31 +7,14 @@ import com.cab302.wellbeing.DataBaseConnection;
 import javafx.application.Platform;
 import javafx.scene.control.*;
 import org.junit.jupiter.api.*;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-/**
- * This class is used to test the RegisterController class.
- * It uses Mockito to mock the database connection and test the user registration functionality.
- * The tests check if the user registration is successful, fails due to a database issue, fails due to blank inputs, and fails due to an invalid email format.
- * The tests also clean up the database after they are run.
- * The test cases include:
- * - testRegisterUser_SuccessfulRegistration
- * - testRegisterUser_FailedRegistration_DatabaseIssue
- * - testRegisterUser_ValidationFailure_BlankInputs
- * - testRegisterUser_ValidationFailure_EmailFormat
- * The testRegisterUser_SuccessfulRegistration test checks if the user registration is successful.
- * The testRegisterUser_FailedRegistration_DatabaseIssue test checks if the user registration fails due to a database issue.
- * The testRegisterUser_ValidationFailure_BlankInputs test checks if the user registration fails due to blank inputs.
- * The testRegisterUser_ValidationFailure_EmailFormat test checks if the user registration fails due to an invalid email format.
- * The tests clean up the database after they are run.
- * The tests use the setUpAll method to initialize the RegisterController object.
- * The tests use the setUp method to initialize the mocks and set up the test environment.
- * The tests use the tearDown method to clean up the database after they are run.
- */
 public class RegisterControllerTest {
 
     @InjectMocks
@@ -48,28 +31,15 @@ public class RegisterControllerTest {
 
     @Mock
     private ResultSet mockResultSet;
+
     private static Connection realTestDbConnection;
 
-    /**
-     * This method is run once before all tests.
-     * It initializes the RegisterController object.
-     */
     @BeforeAll
-    public static void setUpAll() {
-        Platform.startup(() -> {
-            registerController = new RegisterController();
-            try {
-                realTestDbConnection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/wellbeing", "cab302", "cab302");
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        });
+    public static void setUpAll() throws SQLException {
+        Platform.startup(() -> registerController = new RegisterController());
+        realTestDbConnection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/wellbeing", "cab302", "cab302");
     }
 
-    /**
-     * This method is run before each test.
-     * It initializes the mocks and sets up the test environment.
-     */
     @BeforeEach
     public void setUp() throws SQLException {
         MockitoAnnotations.openMocks(this);
@@ -82,88 +52,67 @@ public class RegisterControllerTest {
         registerController.txtEmail = new TextField();
         registerController.ptxtPwd = new PasswordField();
         registerController.ptxtRetp = new PasswordField();
+        registerController.chbQ1 = new ChoiceBox<>();
+        registerController.chbQ2 = new ChoiceBox<>();
+        registerController.txtA1 = new TextField();
+        registerController.txtA2 = new TextField();
         registerController.lblMsg = new Label();
         registerController.radbAdm = new RadioButton();
         registerController.ckUser = new CheckBox();
+        setupValidInputs();
     }
 
-    /**
-     * This test checks if the user registration is successful.
-     */
-    @Test
-    public void testRegisterUser_SuccessfulRegistration() throws Exception {
-        // Set up user input
+    private void setupValidInputs() {
         registerController.txtFName.setText("John");
         registerController.txtLName.setText("Doe");
         registerController.txtUsername.setText("johndoe");
         registerController.txtEmail.setText("john.doe@example.com");
         registerController.ptxtPwd.setText("password123");
         registerController.ptxtRetp.setText("password123");
+        registerController.chbQ1.getItems().addAll("What is the last name of your favourite high school teacher?");
+        registerController.chbQ2.getItems().addAll("What is your favourite colour?");
+        registerController.chbQ1.getSelectionModel().select(0);
+        registerController.chbQ2.getSelectionModel().select(0);
+        registerController.txtA1.setText("Smith");
+        registerController.txtA2.setText("Blue");
         registerController.ckUser.setSelected(true);
-
-        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
-
-        registerController.registerUser();
-
-        assertEquals("Successfully registered.", registerController.lblMsg.getText());
     }
 
-    /**
-     * This test checks if the user registration fails due to a database issue.
-     */
-    @Test
-    public void testRegisterUser_FailedRegistration_DatabaseIssue() throws Exception {
-        registerController.txtFName.setText("John");
-        registerController.txtLName.setText("Doe");
-        registerController.txtUsername.setText("johndoe");
-        registerController.txtEmail.setText("john.doe@example.com");
-        registerController.ptxtPwd.setText("password123");
-        registerController.ptxtRetp.setText("password123");
-        registerController.ckUser.setSelected(true);
-
-        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(0);
-
-        registerController.registerUser();
-
-        assertEquals("Username already exists. Please choose a different one.", registerController.lblMsg.getText());
+    private void setupInvalidEmailFormatInputs() {
+        registerController.txtEmail.setText("john.doe");
     }
 
-    /**
-     * This test checks if the user registration fails due to blank inputs.
-     */
     @Test
-    public void testRegisterUser_ValidationFailure_BlankInputs() {
+    public void testRegisterUser_InvalidInputs() {
+        registerController.txtFName.clear();
         registerController.registerUser();
-
         assertEquals("Please fill all the information above.", registerController.lblMsg.getText());
     }
 
-    /**
-     * This test checks if the user registration fails due to an invalid email format.
-     */
+    @Test
+    public void testRegisterUser_SuccessfulRegistration() throws SQLException {
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+        registerController.registerUser();
+        assertEquals("Successfully registered.", registerController.lblMsg.getText());
+    }
+
+    @Test
+    public void testRegisterUser_UsernameExists() throws SQLException {
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        when(mockResultSet.next()).thenReturn(true);
+        registerController.registerUser();
+        assertEquals("Username already exists. Please choose a different one.", registerController.lblMsg.getText());
+    }
+
     @Test
     public void testRegisterUser_ValidationFailure_EmailFormat() {
-        registerController.txtFName.setText("John");
-        registerController.txtLName.setText("Doe");
-        registerController.txtUsername.setText("johndoe");
-        registerController.txtEmail.setText("john.doe");
-        registerController.ptxtPwd.setText("password123");
-        registerController.ptxtRetp.setText("password123");
-        registerController.ckUser.setSelected(true);
-
+        setupInvalidEmailFormatInputs();
         assertFalse(registerController.validateInputs());
         assertEquals("Invalid email format.", registerController.lblMsg.getText());
-
     }
-    /**
-     * This method is run after all tests.
-     * It cleans up the database after the tests are run.
-     */
+
     @AfterAll
-    public static void tearDown() throws Exception {
-        // Clean up the database
+    public static void tearDown() throws SQLException {
         String deleteUserQuery = "DELETE FROM useraccount WHERE userName = ? OR emailAddress = ?";
         try (PreparedStatement deleteStmt = realTestDbConnection.prepareStatement(deleteUserQuery)) {
             deleteStmt.setString(1, "johndoe");
@@ -173,5 +122,4 @@ public class RegisterControllerTest {
             realTestDbConnection.close();
         }
     }
-
 }

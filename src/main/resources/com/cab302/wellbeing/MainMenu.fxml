@@ -34,7 +34,7 @@
             <Font name="Snap ITC" size="24.0" />
          </font>
       </Label>
-      <Button fx:id="btnReport" layoutX="321.0" layoutY="151.0" maxHeight="202.0" maxWidth="202.0" minHeight="198.0" minWidth="198.0" mnemonicParsing="false" onAction="#handleReportButton" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #009ee0;" text="Repot" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+      <Button fx:id="btnReport" layoutX="321.0" layoutY="151.0" maxHeight="202.0" maxWidth="202.0" minHeight="198.0" minWidth="198.0" mnemonicParsing="false" onAction="#handleReportButton" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #009ee0;" text="Report" textAlignment="CENTER" textFill="WHITE" wrapText="true">
          <font>
             <Font name="Segoe Print Bold" size="30.0" />
          </font>

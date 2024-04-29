@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.cab302.wellbeing.DataBaseConnection;
-import com.cab302.wellbeing.UserSession;
 import javafx.application.Platform;
 import javafx.scene.control.*;
 import org.junit.jupiter.api.BeforeAll;
@@ -14,18 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.sql.*;
-import java.time.LocalDate;
-
-import javafx.application.Platform;
-import javafx.scene.control.*;
 import org.junit.jupiter.api.*;
-import org.mockito.*;
-
-import javafx.application.Platform;
-import javafx.scene.control.*;
-import org.junit.jupiter.api.*;
-import org.mockito.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
