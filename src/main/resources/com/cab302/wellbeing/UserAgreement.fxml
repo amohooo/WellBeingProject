@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+
+<AnchorPane prefHeight="979.0" prefWidth="903.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cab302.wellbeing.controller.UserAgreementController">
+   <children>
+      <Label layoutX="183.0" layoutY="57.0" prefHeight="45.0" prefWidth="479.0" text="Mindful Browser User Agreement" textAlignment="CENTER">
+         <font>
+            <Font name="System Bold" size="30.0" />
+         </font>
+      </Label>
+      <TextArea editable="false" layoutX="71.0" layoutY="148.0" prefHeight="673.0" prefWidth="754.0" text="Welcome to Mindful Browser!&#10;&#10;Before you begin using Mindful Browser, please read this User Agreement carefully. By registering for and using Mindful Browser, you agree to be bound by these terms.&#10;&#10;1. Registration and Account CreationTo use Mindful Browser, you must register and create an account. During registration, you are required to provide truthful and accurate information:Username: Choose a unique username.First Name and Last NameDate of BirthSexEmail AddressPassword: Your password will be hashed for security.Security Questions: Select two security questions and provide answers. Answers will be hashed to ensure privacy.You are responsible for maintaining the confidentiality of your account and password and for restricting access to your computer. You agree to accept responsibility for all activities that occur under your account or password.&#10;&#10;2. Privacy and Data UsageMindful Browser is committed to protecting your privacy. Your registration information and any data generated from your use of the browser are subject to our Privacy Policy, which outlines our practices concerning data collection, use, and sharing.&#10;&#10;3. Usage Tracking and LimitsMindful Browser provides features that track your internet usage and allow you to set browsing limits. These features are designed to help you manage your digital wellbeing. You consent to the tracking of your usage data for these purposes.&#10;&#10;4. NotificationsYou agree to receive notifications related to your browsing habits and limits you set. These notifications are intended to support your goals for mindful internet usage.&#10;&#10;5. Modifications to the AgreementMindful Browser reserves the right to modify this User Agreement at any time. Changes will be communicated through the browser or via email, and your continued use of the browser after such changes will constitute your acceptance of the new terms.&#10;&#10;6. TerminationMindful Browser may terminate your access to all or any part of the browser at any time, with or without cause, with or without notice, effective immediately, for any reason whatsoever.&#10;&#10;7. Governing LawThis Agreement shall be governed by and construed in accordance with the laws of the jurisdiction in which the company is based, without giving effect to any principles of conflicts of law.&#10;&#10;8. Dispute ResolutionAny disputes arising under this Agreement will be resolved through final and binding arbitration, under the rules of arbitration of the jurisdiction in which the company is based.&#10;&#10;9. Contact UsIf you have any questions about this User Agreement, please contact us at [Contact Email/Phone].By clicking “I Agree,” you acknowledge that you have read, understood, and agree to be bound by this User Agreement." wrapText="true">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </TextArea>
+      <Button fx:id="btnAgree" layoutX="419.0" layoutY="870.0" mnemonicParsing="false" text="Accept">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Button>
+      <Button fx:id="btnCanc" layoutX="769.0" layoutY="885.0" mnemonicParsing="false" text="Cancel">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Button>
+   </children>
+</AnchorPane>

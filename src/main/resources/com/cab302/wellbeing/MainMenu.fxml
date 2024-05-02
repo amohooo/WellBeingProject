@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane blendMode="MULTIPLY" prefHeight="711.0" prefWidth="841.0" style="-fx-background-color: E1E5F0;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cab302.wellbeing.controller.MainMenuController">
+   <children>
+      <Button fx:id="btnExplorer" layoutX="56.0" layoutY="151.0" maxHeight="202.0" maxWidth="202.0" minHeight="198.0" minWidth="198.0" mnemonicParsing="false" onAction="#handleInternetButton" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #009ee0;" text="Internet Explorer" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+         <font>
+            <Font name="Segoe Print Bold" size="30.0" />
+         </font>
+         <padding>
+            <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+         </padding>
+         <effect>
+            <DropShadow />
+         </effect>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+      </Button>
+      <Button fx:id="btnLogOut" layoutX="705.0" layoutY="652.0" mnemonicParsing="false" onAction="#btnLogOutOnAction" prefHeight="30.0" prefWidth="80.0" style="-fx-background-color: #009ee0;" text="Log out" textFill="WHITE">
+         <font>
+            <Font name="Segoe Print Bold" size="13.0" />
+         </font></Button>
+      <Label fx:id="lblName" layoutX="128.0" layoutY="55.0" prefHeight="38.0" prefWidth="706.0" textFill="#009ee0">
+         <font>
+            <Font name="Snap ITC" size="24.0" />
+         </font>
+      </Label>
+      <Button fx:id="btnReport" layoutX="321.0" layoutY="151.0" maxHeight="202.0" maxWidth="202.0" minHeight="198.0" minWidth="198.0" mnemonicParsing="false" onAction="#handleReportButton" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #009ee0;" text="Report" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+         <font>
+            <Font name="Segoe Print Bold" size="30.0" />
+         </font>
+         <padding>
+            <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+         </padding>
+         <effect>
+            <DropShadow />
+         </effect>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+      </Button>
+      <Button fx:id="btnWebe" layoutX="585.0" layoutY="151.0" maxHeight="202.0" maxWidth="202.0" minHeight="198.0" minWidth="198.0" mnemonicParsing="false" onAction="#handleWebeButton" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #009ee0;" text="Wellbeing Tips" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+         <font>
+            <Font name="Segoe Print Bold" size="30.0" />
+         </font>
+         <padding>
+            <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+         </padding>
+         <effect>
+            <DropShadow />
+         </effect>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+      </Button>
+      <Button fx:id="btnUser" layoutX="56.0" layoutY="403.0" maxHeight="202.0" maxWidth="202.0" minHeight="198.0" minWidth="198.0" mnemonicParsing="false" onAction="#handleUserProfileButton" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #009ee0;" text="User profile" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+         <font>
+            <Font name="Segoe Print Bold" size="30.0" />
+         </font>
+         <padding>
+            <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+         </padding>
+         <effect>
+            <DropShadow />
+         </effect>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+      </Button>
+      <Button fx:id="btnSetting" layoutX="321.0" layoutY="403.0" maxHeight="202.0" maxWidth="202.0" minHeight="198.0" minWidth="198.0" mnemonicParsing="false" onAction="#handleUserSettingButton" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #009ee0;" text="Settings" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+         <font>
+            <Font name="Segoe Print Bold" size="30.0" />
+         </font>
+         <padding>
+            <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+         </padding>
+         <effect>
+            <DropShadow />
+         </effect>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+      </Button>
+      <Button fx:id="btnContact" layoutX="585.0" layoutY="403.0" maxHeight="202.0" maxWidth="202.0" minHeight="198.0" minWidth="198.0" mnemonicParsing="false" onAction="#handleContactButton" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #009ee0;" text="Contact us" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+         <font>
+            <Font name="Segoe Print Bold" size="30.0" />
+         </font>
+         <padding>
+            <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+         </padding>
+         <effect>
+            <DropShadow />
+         </effect>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+      </Button>
+      <ImageView fitHeight="117.0" fitWidth="100.0" layoutX="14.0" layoutY="7.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@image/physical-wellbeing.png" />
+         </image>
+      </ImageView>
+   </children>
+</AnchorPane>
