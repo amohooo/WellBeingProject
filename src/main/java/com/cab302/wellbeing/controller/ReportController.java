@@ -31,6 +31,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class ReportController {
@@ -215,8 +216,7 @@ public class ReportController {
         return sortDataset(res);
     }
 
-    private List<BarChartModel> sortDataset(List<BarChartModel> dataset) {
-        // Bubble sort to sort the dataset based on durationSum in descending order
+    public List<BarChartModel> sortDataset(List<BarChartModel> dataset) {
         int n = dataset.size();
         for (int i = 0; i < n - 1; i++) {
             for (int j = 0; j < n - i - 1; j++) {
@@ -231,12 +231,11 @@ public class ReportController {
         return dataset;
     }
 
-    private List<BarChartModel> getTop5(List<BarChartModel> dataset) {
-        int topN = 5;
-        if (dataset.size() < topN) {
-            return dataset;
-        }
-        return dataset.subList(0, topN); // Ensure it returns exactly 5 entries if available
+    public List<BarChartModel> getTop5(List<BarChartModel> dataset) {
+        return dataset.stream()
+                .sorted((a, b) -> Integer.compare(b.durationSum, a.durationSum))
+                .limit(5)
+                .collect(Collectors.toList());
     }
 
     public List<BarChartModel> getTop5BCDataset() {
@@ -301,22 +300,3 @@ public class ReportController {
     }
 }
 
-class LineChartModel {
-    LocalDate sessionDate;
-    Integer durationSum;
-
-    public LineChartModel(LocalDate sessionDate, Integer durationSum) {
-        this.sessionDate = sessionDate;
-        this.durationSum = durationSum;
-    }
-}
-
-class BarChartModel {
-    String url;
-    Integer durationSum;
-
-    public BarChartModel(String url, Integer durationSum) {
-        this.url = url;
-        this.durationSum = durationSum;
-    }
-}

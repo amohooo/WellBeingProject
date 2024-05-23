@@ -25,7 +25,9 @@ public class PasswordResetController {
     @FXML
     public TextField txtAn2;
     @FXML
-    PasswordField ptxtPwd, ptxtRePwd;
+    public PasswordField ptxtPwd;
+    @FXML
+    public PasswordField ptxtRePwd;
     @FXML
     public Label lblMsg;
     @FXML
@@ -39,7 +41,7 @@ public class PasswordResetController {
     @FXML
     public Button btnCncl;
     @FXML
-    Button btnVerify;
+    public Button btnVerify;
     @FXML
     private void initialize() {
         // Disable the reset button initially until answers are verified

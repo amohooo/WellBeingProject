@@ -22,7 +22,7 @@ public class UserProfileController {
     @FXML
     public TextField txtUserName, txtFirstName, txtLastName, txtEmail, txtPassword,txtA1, txtA2;
     @FXML
-    private ToggleGroup accTypeGroup;
+    public ToggleGroup accTypeGroup;
     @FXML
     public ChoiceBox<String> chbQ1, chbQ2;
     @FXML
@@ -410,4 +410,3 @@ public class UserProfileController {
                 color.getOpacity());
     }
 }
-
