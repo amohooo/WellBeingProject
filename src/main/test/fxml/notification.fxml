@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" prefHeight="285.0" prefWidth="450.0" spacing="20.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cab302.wellbeing.controller.NotificationController">
+    <children>
+        <Label fx:id="notificationLabel" alignment="CENTER" prefHeight="66.0" prefWidth="410.0" text="Notification" textAlignment="CENTER" textOverrun="CLIP" />
+        <Button onAction="#handleOK" text="OK" />
+    </children>
+    <padding>
+        <Insets bottom="20" left="20" right="20" top="20" />
+    </padding>
+</VBox>

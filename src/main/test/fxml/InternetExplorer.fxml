@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.web.*?>
+
+<AnchorPane fx:id="paneInternet" prefHeight="800.0" prefWidth="1209.0" style="-fx-background-color: #009ee0;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cab302.wellbeing.controller.InternetExplorerController">
+   <children>
+      <Label fx:id="lblBkGrd" layoutX="25.0" layoutY="4.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+      <WebView fx:id="webView" layoutX="11.0" layoutY="105.0" maxHeight="-1.0" maxWidth="-1.0" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="11.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="105.0" />
+      <Button fx:id="btnLoad" layoutX="14.0" layoutY="68.0" mnemonicParsing="false" onAction="#LoadPage" style="-fx-background-color: #009ee0;" text="Load" textFill="WHITE">
+         <font>
+            <Font name="Segoe Print Bold" size="12.0" />
+         </font>
+         <effect>
+            <DropShadow>
+               <color>
+                  <Color opacity="0.4694656431674957" />
+               </color>
+            </DropShadow>
+         </effect></Button>
+      <TextField fx:id="txtAddr" layoutX="9.0" layoutY="32.0" onAction="#LoadPage" AnchorPane.leftAnchor="9.0" AnchorPane.rightAnchor="17.0" AnchorPane.topAnchor="32.0" />
+      <Button fx:id="btnRfrsh" layoutX="73.0" layoutY="68.0" mnemonicParsing="false" onAction="#refreshPage" style="-fx-background-color: #009ee0;" text="Refresh" textFill="WHITE">
+         <font>
+            <Font name="Segoe Print Bold" size="12.0" />
+         </font>
+         <effect>
+            <DropShadow>
+               <color>
+                  <Color opacity="0.4694656431674957" />
+               </color>
+            </DropShadow>
+         </effect></Button>
+      <Button fx:id="btnZmIn" layoutX="151.0" layoutY="68.0" mnemonicParsing="false" onAction="#zoomIn" style="-fx-background-color: #009ee0;" text="+" textFill="WHITE">
+         <font>
+            <Font name="Segoe Print Bold" size="12.0" />
+         </font>
+         <effect>
+            <DropShadow>
+               <color>
+                  <Color opacity="0.4694656431674957" />
+               </color>
+            </DropShadow>
+         </effect></Button>
+      <Button fx:id="btnZmOut" layoutX="191.0" layoutY="68.0" mnemonicParsing="false" onAction="#zoomOut" style="-fx-background-color: #009ee0;" text="-" textFill="WHITE">
+         <font>
+            <Font name="Segoe Print Bold" size="12.0" />
+         </font>
+         <effect>
+            <DropShadow>
+               <color>
+                  <Color opacity="0.4694656431674957" />
+               </color>
+            </DropShadow>
+         </effect></Button>
+      <Button fx:id="btnHstry" layoutX="236.0" layoutY="68.0" mnemonicParsing="false" onAction="#switchToHistoryScene" style="-fx-background-color: #009ee0;" text="History" textFill="WHITE">
+         <font>
+            <Font name="Segoe Print Bold" size="12.0" />
+         </font>
+         <effect>
+            <DropShadow>
+               <color>
+                  <Color opacity="0.4694656431674957" />
+               </color>
+            </DropShadow>
+         </effect></Button>
+      <Button fx:id="btnBack" layoutX="317.0" layoutY="68.0" mnemonicParsing="false" onAction="#back" style="-fx-background-color: #009ee0;" text="Back" textFill="WHITE">
+         <font>
+            <Font name="Segoe Print Bold" size="12.0" />
+         </font>
+         <effect>
+            <DropShadow>
+               <color>
+                  <Color opacity="0.4694656431674957" />
+               </color>
+            </DropShadow>
+         </effect></Button>
+      <Button fx:id="btnFwd" layoutX="380.0" layoutY="68.0" mnemonicParsing="false" onAction="#forward" style="-fx-background-color: #009ee0;" text="Forward" textFill="WHITE">
+         <font>
+            <Font name="Segoe Print Bold" size="12.0" />
+         </font>
+         <effect>
+            <DropShadow>
+               <color>
+                  <Color opacity="0.4694656431674957" />
+               </color>
+            </DropShadow>
+         </effect></Button>
+      <Button fx:id="btnEnd" layoutX="1091.0" layoutY="68.0" mnemonicParsing="false" onAction="#endSession" style="-fx-background-color: #009ee0;" text="End Exploring" textFill="WHITE" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="68.0">
+         <font>
+            <Font name="Segoe Print Bold" size="12.0" />
+         </font>
+         <effect>
+            <DropShadow>
+               <color>
+                  <Color opacity="0.4694656431674957" />
+               </color>
+            </DropShadow>
+         </effect></Button>
+   </children>
+</AnchorPane>

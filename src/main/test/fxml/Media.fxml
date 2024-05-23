@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.media.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane fx:id="paneMedia" prefHeight="749.0" prefWidth="1182.0" style="-fx-background-color: #009ee0;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cab302.wellbeing.controller.MediaController">
+    <children>
+      <Label fx:id="lblBkGrd" layoutX="363.0" layoutY="309.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+        <MediaView fx:id="mediaView" fitHeight="580.0" fitWidth="970.0" layoutX="200.0" layoutY="10.0" AnchorPane.bottomAnchor="160.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="12.0" AnchorPane.topAnchor="12.0" />
+      <VBox layoutX="14.0" layoutY="613.0" prefHeight="105.0" prefWidth="1159.0">
+         <children>
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+               <children>
+                  <Slider fx:id="slider" onMousePressed="#sliderPressed" HBox.hgrow="ALWAYS">
+                     <padding>
+                        <Insets left="15.0" right="15.0" />
+                     </padding>
+                  </Slider>
+               </children>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+               <padding>
+                  <Insets left="15.0" right="15.0" />
+               </padding>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+               <children>
+                  <Button fx:id="btnSelect" mnemonicParsing="false" onAction="#selectMedia" prefHeight="40.0" prefWidth="70.0" style="-fx-background-color: #009ee0;" text="Select" textFill="WHITE">
+                     <font>
+                        <Font name="Segoe Print Bold" size="14.0" />
+                     </font>
+                     <effect>
+                        <DropShadow>
+                           <color>
+                              <Color opacity="0.42748090624809265" />
+                           </color>
+                           <input>
+                              <Glow />
+                           </input>
+                        </DropShadow>
+                     </effect>
+                  </Button>
+                    <Button fx:id="btnPlay" mnemonicParsing="false" onAction="#playMedia" prefHeight="40.0" prefWidth="70.0" style="-fx-background-color: #009ee0;" text="Play" textFill="WHITE">
+                        <font>
+                            <Font name="Segoe Print Bold" size="14.0" />
+                        </font>
+                        <effect>
+                            <DropShadow>
+                                <color>
+                                    <Color opacity="0.572519063949585" />
+                                </color>
+                                <input>
+                                    <Glow />
+                                </input>
+                            </DropShadow>
+                        </effect>
+                  </Button>
+                  <Button fx:id="btnPause" mnemonicParsing="false" onAction="#pauseMedia" prefHeight="40.0" prefWidth="70.0" style="-fx-background-color: #009ee0;" text="Pause" textFill="WHITE">
+                     <font>
+                        <Font name="Segoe Print Bold" size="14.0" />
+                     </font>
+                     <effect>
+                        <DropShadow>
+                           <color>
+                              <Color opacity="0.5687022805213928" />
+                           </color>
+                           <input>
+                              <Glow />
+                           </input>
+                        </DropShadow>
+                     </effect>
+                  </Button>
+                    <Button fx:id="btnStop" mnemonicParsing="false" onAction="#stopMedia" prefHeight="40.0" prefWidth="70.0" style="-fx-background-color: #009ee0;" text="Stop" textFill="WHITE">
+                        <font>
+                            <Font name="Segoe Print Bold" size="14.0" />
+                        </font>
+                        <effect>
+                            <DropShadow>
+                                <color>
+                                    <Color opacity="0.572519063949585" />
+                                </color>
+                                <input>
+                                    <Glow />
+                                </input>
+                            </DropShadow>
+                        </effect>
+                  </Button>
+                  <Label fx:id="lblDuration" text="Duration: 00 / 00" textFill="WHITE" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+      <ChoiceBox fx:id="chbMedia" layoutX="22.0" layoutY="111.0" prefWidth="150.0" style="-fx-background-color: #009ee0;">
+         <effect>
+            <DropShadow>
+               <color>
+                  <Color opacity="0.5229007601737976" />
+               </color>
+               <input>
+                  <Glow />
+               </input>
+            </DropShadow>
+         </effect>
+      </ChoiceBox>
+      <Label fx:id="lblMedia" layoutX="22.0" layoutY="57.0" prefHeight="17.0" prefWidth="150.0" text="Load Media" textFill="WHITE">
+         <font>
+            <Font name="Segoe Print Bold" size="24.0" />
+         </font>
+      </Label>
+      <Button fx:id="btnRFS" layoutX="102.0" layoutY="161.0" mnemonicParsing="false" onAction="#refreshMediaList" prefHeight="40.0" prefWidth="70.0" style="-fx-background-color: #009ee0;" text="Refresh" textFill="WHITE">
+         <font>
+            <Font name="Segoe Print Bold" size="14.0" />
+         </font>
+         <effect>
+            <DropShadow>
+               <color>
+                  <Color opacity="0.5687022805213928" />
+               </color>
+               <input>
+                  <Glow />
+               </input>
+            </DropShadow>
+         </effect>
+      </Button>
+      <Button fx:id="btnUpload" layoutX="44.0" layoutY="568.0" mnemonicParsing="false" onAction="#uploadMedia" prefHeight="40.0" prefWidth="70.0" style="-fx-background-color: #009ee0;" text="Upload" textFill="WHITE">
+         <font>
+            <Font name="Segoe Print Bold" size="14.0" />
+         </font>
+         <effect>
+            <DropShadow>
+               <color>
+                  <Color opacity="0.5687022805213928" />
+               </color>
+               <input>
+                  <Glow />
+               </input>
+            </DropShadow>
+         </effect>
+      </Button>
+      <Button fx:id="btnDelete" layoutX="18.0" layoutY="161.0" mnemonicParsing="false" onAction="#deleteMedia" prefHeight="40.0" prefWidth="70.0" style="-fx-background-color: #009ee0;" text="Delete" textFill="WHITE">
+         <font>
+            <Font name="Segoe Print Bold" size="14.0" />
+         </font>
+         <effect>
+            <DropShadow>
+               <color>
+                  <Color opacity="0.5687022805213928" />
+               </color>
+               <input>
+                  <Glow />
+               </input>
+            </DropShadow>
+         </effect>
+      </Button>
+    </children>
+</AnchorPane>
