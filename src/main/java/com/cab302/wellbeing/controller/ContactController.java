@@ -1,6 +1,5 @@
 package com.cab302.wellbeing.controller;
 
-import com.cab302.wellbeing.model.AppSettings;
 import com.cab302.wellbeing.model.ChatClientThread2;
 import com.cab302.wellbeing.model.DataBaseConnection;
 import javafx.application.Platform;

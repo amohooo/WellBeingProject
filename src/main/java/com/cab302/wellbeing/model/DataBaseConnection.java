@@ -1,5 +1,6 @@
 package com.cab302.wellbeing.model;
 
+import com.cab302.wellbeing.controller.AppSettings;
 import javafx.scene.paint.Color;
 import org.mindrot.jbcrypt.BCrypt;
 
