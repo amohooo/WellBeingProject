@@ -1,8 +1,6 @@
 package com.cab302.wellbeing.controller;
 
-import com.cab302.wellbeing.AppSettings;
-import com.cab302.wellbeing.ChatClientThread2;
-import com.cab302.wellbeing.DataBaseConnection;
+import com.cab302.wellbeing.*;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

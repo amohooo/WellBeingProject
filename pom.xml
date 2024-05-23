@@ -33,7 +33,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.22</version> <!-- You can adjust the version to the latest one available -->
+            <version>8.0.22</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>

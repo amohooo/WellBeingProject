@@ -1,6 +1,6 @@
 package com.cab302.wellbeing.controller;
 
-import com.cab302.wellbeing.DataBaseConnection;
+import com.cab302.wellbeing.*;
 import javafx.animation.PauseTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
