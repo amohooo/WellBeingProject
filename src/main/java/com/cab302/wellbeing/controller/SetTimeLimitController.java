@@ -27,13 +27,27 @@ public class SetTimeLimitController {
     @FXML
     public TextField txtHH, txtMM, txtSS;
     @FXML
-    private Label lblSetTime, lblActive, lblWhen, lblTitle, lblDot1, lblDot2, lblMsg, lblBkGrd;
+    public Label lblSetTime;
+    @FXML
+    public Label lblActive;
+    @FXML
+    public Label lblWhen;
+    @FXML
+    public Label lblTitle;
+    @FXML
+    public Label lblDot1;
+    @FXML
+    public Label lblDot2;
+    @FXML
+    public Label lblMsg;
+    @FXML
+    public Label lblBkGrd;
     @FXML
     public CheckBox chbActive;
     @FXML
     public RadioButton rdbNotify, rdbAsk, rdbExit;
     @FXML
-    private Pane paneSetLimit;
+    public Pane paneSetLimit;
     private DataBaseConnection dbConnection = new DataBaseConnection();
     @FXML
     public Button btnSaveT, btnCancelT;
@@ -141,7 +155,7 @@ public class SetTimeLimitController {
 
 
     @FXML
-    private void saveTimeLimits() {
+    public void saveTimeLimits() {
         Stage stage = (Stage) btnCancelT.getScene().getWindow();
 
         try {

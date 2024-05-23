@@ -7,14 +7,6 @@ import java.sql.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import org.junit.jupiter.api.*;
-import org.mockito.*;
-
-import java.sql.*;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
 class DatabaseTesting {
 
     @Mock

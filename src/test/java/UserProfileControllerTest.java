@@ -74,15 +74,15 @@ public class UserProfileControllerTest {
     }
 
     private void setupValidInputs() {
-        userProfileController.txtUserName.setText("johndoe");
-        userProfileController.txtFirstName.setText("John");
-        userProfileController.txtLastName.setText("Doe");
-        userProfileController.txtEmail.setText("john.doe@example.com");
-        userProfileController.txtPassword.setText("password123");
-        userProfileController.txtA1.setText("Smith");
-        userProfileController.txtA2.setText("Blue");
+        userProfileController.txtUserName.setText("cab302");
+        userProfileController.txtFirstName.setText("cab302");
+        userProfileController.txtLastName.setText("cab302");
+        userProfileController.txtEmail.setText("cab302@qut.edu.au");
+        userProfileController.txtPassword.setText("cab302");
+        userProfileController.txtA1.setText("cab302");
+        userProfileController.txtA2.setText("cab302");
         userProfileController.chbQ1.getItems().addAll("What is the last name of your favourite high school teacher?");
-        userProfileController.chbQ2.getItems().addAll("What is your favourite colour?");
+        userProfileController.chbQ2.getItems().addAll("What is your mother’s maiden name?");
         userProfileController.chbQ1.getSelectionModel().select(0);
         userProfileController.chbQ2.getSelectionModel().select(0);
     }
@@ -91,23 +91,23 @@ public class UserProfileControllerTest {
     public void testDisplayUserProfile_ValidUser() throws SQLException {
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(true);
-        when(mockResultSet.getString("accType")).thenReturn("Admin");
-        when(mockResultSet.getString("userName")).thenReturn("johndoe");
-        when(mockResultSet.getString("firstName")).thenReturn("John");
-        when(mockResultSet.getString("lastName")).thenReturn("Doe");
-        when(mockResultSet.getString("emailAddress")).thenReturn("john.doe@example.com");
+        when(mockResultSet.getString("accType")).thenReturn("Developer");
+        when(mockResultSet.getString("userName")).thenReturn("cab302");
+        when(mockResultSet.getString("firstName")).thenReturn("cab302");
+        when(mockResultSet.getString("lastName")).thenReturn("cab302");
+        when(mockResultSet.getString("emailAddress")).thenReturn("cab302@qut.edu.au");
         when(mockResultSet.getString("Question_1")).thenReturn("What is the last name of your favourite high school teacher?");
-        when(mockResultSet.getString("Question_2")).thenReturn("What is your favourite colour?");
+        when(mockResultSet.getString("Question_2")).thenReturn("What is your mother’s maiden name?");
 
         Platform.runLater(() -> {
             userProfileController.setUserId(1);
             userProfileController.displayUserProfile();
-            assertEquals("johndoe", userProfileController.txtUserName.getText());
-            assertEquals("John", userProfileController.txtFirstName.getText());
-            assertEquals("Doe", userProfileController.txtLastName.getText());
-            assertEquals("john.doe@example.com", userProfileController.txtEmail.getText());
+            assertEquals("cab302", userProfileController.txtUserName.getText());
+            assertEquals("cab302", userProfileController.txtFirstName.getText());
+            assertEquals("cab302", userProfileController.txtLastName.getText());
+            assertEquals("cab302@qut.edu.au", userProfileController.txtEmail.getText());
             assertEquals("What is the last name of your favourite high school teacher?", userProfileController.chbQ1.getValue());
-            assertEquals("What is your favourite colour?", userProfileController.chbQ2.getValue());
+            assertEquals("What is your mother’s maiden name?", userProfileController.chbQ2.getValue());
         });
     }
 

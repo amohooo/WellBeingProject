@@ -27,7 +27,7 @@ public class WellBeingController {
     @FXML
     public Button btnExit;
     @FXML
-    Button btnRegst;
+    public Button btnRegst;
     @FXML
     public TextField txtUsr;
     @FXML
