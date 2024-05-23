@@ -46,7 +46,7 @@ public class DataBaseConnection {
         try {
             if (databaseLink == null || databaseLink.isClosed() || !databaseLink.isValid(5)) {
                 createDatabase(); // Ensure the database is created first
-                databaseLink = DriverManager.getConnection(DATABASE_URL + DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
+                databaseLink = DriverManager.getConnection(databaseUrl, databaseUser, databasePass);
                 System.out.println("Connected to database successfully.");
             }
         } catch (SQLException e) {
@@ -196,13 +196,14 @@ public class DataBaseConnection {
         String hashedPassword = hashPassword(password);
         String hashAnswer1 = hashPassword(questionAnswer1);
         String hashAnswer2 = hashPassword(questionAnswer2);
+
         // Retrieve the first available question IDs from PwdQuestions1 and PwdQuestions2
         int questionID1 = getFirstQuestionID("PwdQuestions1");
         int questionID2 = getFirstQuestionID("PwdQuestions2");
 
         // Check if username exists
         String checkUserQuery = "SELECT COUNT(*) FROM useraccount WHERE userName = ?";
-        try (PreparedStatement checkStmt = databaseLink.prepareStatement(checkUserQuery)) {
+        try (PreparedStatement checkStmt = getConnection().prepareStatement(checkUserQuery)) {
             checkStmt.setString(1, userName);
             ResultSet rs = checkStmt.executeQuery();
             if (rs.next() && rs.getInt(1) > 0) {
@@ -216,7 +217,7 @@ public class DataBaseConnection {
         }
 
         String query = "INSERT INTO useraccount (userName, firstName, lastName, passwordHash, emailAddress, QuestionID_1, QuestionID_2, Answer_1, Answer_2, RegistrationCode, accType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement pstmt = databaseLink.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement pstmt = getConnection().prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, userName);
             pstmt.setString(2, firstName);
             pstmt.setString(3, lastName);
@@ -237,25 +238,24 @@ public class DataBaseConnection {
             System.err.println("Error inserting user: " + e.getMessage());
             e.printStackTrace();
             try {
-                databaseLink.rollback(); // Rollback transaction in case of error
+                getConnection().rollback(); // Rollback transaction in case of error
             } catch (SQLException sqle) {
                 System.err.println("Error rolling back: " + sqle.getMessage());
             }
         } finally {
             try {
-                databaseLink.setAutoCommit(true); // Re-enable auto-commit
+                getConnection().setAutoCommit(true); // Re-enable auto-commit
             } catch (SQLException sqle) {
                 System.err.println("Error resetting auto-commit: " + sqle.getMessage());
             }
         }
     }
-
     public void insertRegistrationCode() {
         String Code = "cab302";
 
         // Check if username exists
         String checkUserQuery = "SELECT COUNT(*) FROM developer WHERE RegistrationCode = ?";
-        try (PreparedStatement checkStmt = databaseLink.prepareStatement(checkUserQuery)) {
+        try (PreparedStatement checkStmt = getConnection().prepareStatement(checkUserQuery)) {
             checkStmt.setString(1, Code);
             ResultSet rs = checkStmt.executeQuery();
             if (rs.next() && rs.getInt(1) > 0) {
@@ -270,7 +270,7 @@ public class DataBaseConnection {
         }
 
         String query = "INSERT INTO developer (RegistrationCode) VALUES (?)";
-        try (PreparedStatement pstmt = databaseLink.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement pstmt = getConnection().prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, Code);
 
             int affectedRows = pstmt.executeUpdate();
@@ -281,13 +281,13 @@ public class DataBaseConnection {
             System.err.println("Error inserting user: " + e.getMessage());
             e.printStackTrace();
             try {
-                databaseLink.rollback(); // Rollback transaction in case of error
+                getConnection().rollback(); // Rollback transaction in case of error
             } catch (SQLException sqle) {
                 System.err.println("Error rolling back: " + sqle.getMessage());
             }
         } finally {
             try {
-                databaseLink.setAutoCommit(true); // Re-enable auto-commit
+                getConnection().setAutoCommit(true); // Re-enable auto-commit
             } catch (SQLException sqle) {
                 System.err.println("Error resetting auto-commit: " + sqle.getMessage());
             }
@@ -299,7 +299,7 @@ public class DataBaseConnection {
         String columnID = tableName.equals("PwdQuestions1") ? "QuestionID_1" : "QuestionID_2";
 
         String query = "SELECT MIN(" + columnID + ") FROM " + tableName;
-        try (Statement stmt = databaseLink.createStatement();
+        try (Statement stmt = getConnection().createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
             if (rs.next()) {
                 return rs.getInt(1);  // Use the first column index since it's a MIN function result
@@ -312,6 +312,7 @@ public class DataBaseConnection {
             return -1; // Return -1 or handle appropriately
         }
     }
+
     public void insertQuestions() {
         String[] questions = {
                 "What is the last name of your favourite high school teacher?",
@@ -324,8 +325,8 @@ public class DataBaseConnection {
         };
         String checkQuery = "SELECT COUNT(*) FROM PwdQuestions1 WHERE Question_1 = ?";  // Updated column name
         String insertQuery = "INSERT INTO PwdQuestions1 (Question_1) VALUES (?)";  // Updated column name
-        try (PreparedStatement checkStmt = databaseLink.prepareStatement(checkQuery);
-             PreparedStatement insertStmt = databaseLink.prepareStatement(insertQuery)) {
+        try (PreparedStatement checkStmt = getConnection().prepareStatement(checkQuery);
+             PreparedStatement insertStmt = getConnection().prepareStatement(insertQuery)) {
             for (String question : questions) {
                 // Check if the question already exists
                 checkStmt.setString(1, question);
@@ -358,8 +359,8 @@ public class DataBaseConnection {
         };
         String checkQuery = "SELECT COUNT(*) FROM PwdQuestions2 WHERE Question_2 = ?";  // Updated column name
         String insertQuery = "INSERT INTO PwdQuestions2 (Question_2) VALUES (?)";  // Updated column name
-        try (PreparedStatement checkStmt = databaseLink.prepareStatement(checkQuery);
-             PreparedStatement insertStmt = databaseLink.prepareStatement(insertQuery)) {
+        try (PreparedStatement checkStmt = getConnection().prepareStatement(checkQuery);
+             PreparedStatement insertStmt = getConnection().prepareStatement(insertQuery)) {
             for (String question : questions) {
                 // Check if the question already exists
                 checkStmt.setString(1, question);
@@ -378,6 +379,7 @@ public class DataBaseConnection {
             e.printStackTrace();
         }
     }
+
 
     // Utility method to hash a password
     public String hashPassword(String password) {
