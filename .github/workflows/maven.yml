@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
@@ -24,3 +24,11 @@ jobs:
       run: echo "export NODE_OPTIONS=--max_old_space_size=4096" >> $GITHUB_ENV
     - name: Build with Maven
       run: mvn -B package --file pom.xml
+    - name: Xvfb setup
+      run: sudo apt-get install xvfb
+    - name: Start Xvfb
+      run: Xvfb :99 -screen 0 1024x768x16 &
+    - name: Run tests
+      env:
+        DISPLAY: :99
+      run: mvn test
