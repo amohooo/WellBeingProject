@@ -1,5 +1,6 @@
 package com.cab302.wellbeing.controller;
 
+import com.cab302.wellbeing.AppSettings;
 import com.cab302.wellbeing.DataBaseConnection;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -25,21 +26,61 @@ public class UserProfileController {
     @FXML
     public ChoiceBox<String> chbQ1, chbQ2;
     @FXML
-    public Button btnCancel, btnSave;
+    public Button btnCancel, btnSave, btnVerify;
     @FXML
     public RadioButton radbAdm, radbGen, radbDev;
     @FXML
-    public Label lblMsg, lblUserPro, lblUser, lblFirst, lblLast, lblEmail, lblPwd, lblAccType, lblSQ1, lblSQ2, lblAn1, lblAn2;
+    public Label lblBkGrd, lblMsg, lblUserPro, lblUser, lblFirst, lblLast, lblEmail, lblPwd, lblAccType, lblSQ1, lblSQ2, lblAn1, lblAn2;
     @FXML
     private Pane paneProfile;
+    private static Color lightColor = Color.web("#bfe7f7");
+    private static Color nightColor = Color.web("#777777");
+    private static Color autoColor = Color.web("#009ee0");
+    private static Color eyeProtectColor = Color.web("#A3CCBE");
     int userId;
-
+    private String accType;
+    public void setUserType(String accType) {
+        this.accType = accType;
+        System.out.println("User Type: " + accType);
+        if (accType.equals("General")) {
+            radbAdm.setDisable(true);
+            radbDev.setDisable(true);
+            txtUserName.setDisable(true);
+        } else if (accType.equals("Admin")) {
+            radbDev.setDisable(true);
+            txtUserName.setDisable(true);
+        } else if (accType.equals("Developer")) {
+            radbGen.setDisable(true);
+            radbAdm.setDisable(true);
+            txtUserName.setDisable(true);
+        }
+    }
+    private String fetchAccTypeFromDatabase(int userId) {
+        String query = "SELECT accType FROM useraccount WHERE userId = ?";
+        try (Connection conn = new DataBaseConnection().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("accType");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "Admin"; // Default value if the user is not found
+    }
     private DataBaseConnection dbConnection = new DataBaseConnection();
 
     public void setUserId(int userId) {
         this.userId = userId;  // Now you can use this userId to store browsing data linked to the user
     }
+    @FXML
+    private void initialize() {
+        // Disable the reset button initially until answers are verified
+        btnSave.setDisable(true);
 
+        lblMsg.setText("");
+    }
 
     public void displayUserName(String userName){
         this.txtUserName.setText(userName);
@@ -57,9 +98,6 @@ public class UserProfileController {
         this.txtEmail.setText(email);
     }
 
-    public void displayPassword(String password){
-        this.txtPassword.setText(password);
-    }
 
     public void displayAccType(String accType){
         if("Developer".equals(accType)){
@@ -80,14 +118,6 @@ public class UserProfileController {
         }
     }
 
-    public void displayA1(String a1){
-        this.txtA1.setText(a1);
-    }
-
-    public void displayA2(String a2){
-        this.txtA2.setText(a2);
-    }
-
     public void displayUserProfile(){
         try {
             Connection conn = dbConnection.getConnection(); // Get a fresh connection
@@ -98,8 +128,6 @@ public class UserProfileController {
             PreparedStatement preparedStatement = conn.prepareStatement(selectQuery);
             ResultSet queryResult = preparedStatement.executeQuery();
             if (queryResult.next()){
-                int userId = queryResult.getInt("userId");  // Retrieve user ID
-                String storedHash = queryResult.getString("passwordHash"); // Retrieved hashed password
                 String accType = queryResult.getString("accType");
                 String userName = queryResult.getString("userName");// Account type
                 String firstName = queryResult.getString("firstName");
@@ -107,10 +135,7 @@ public class UserProfileController {
                 String email = queryResult.getString("emailAddress");
                 String q1 = queryResult.getString("Question_1");
                 String q2 = queryResult.getString("Question_2");
-                String a1 = queryResult.getString("Answer_1");
-                String a2 = queryResult.getString("Answer_2");
 
-                this.displayPassword(storedHash);
                 this.displayLastName(lastName);
                 this.displayFirstName(firstName);
                 this.displayEmail(email);
@@ -118,8 +143,6 @@ public class UserProfileController {
                 this.displayAccType(accType);
                 this.chbQ1.setValue(q1);
                 this.chbQ2.setValue(q2);
-                this.displayA1(a1);
-                this.displayA2(a2);
 
 
             }
@@ -133,7 +156,6 @@ public class UserProfileController {
         if (!validateInputs()) {
             return; // Exit if inputs are not valid
         }
-
         String insertQuery = "UPDATE useraccount SET userName = ?, emailAddress = ?, firstName = ?, lastName = ?, passwordHash = ?, QuestionID_1 = ? , QuestionID_2 = ? , Answer_1 = ?, Answer_2 = ? WHERE userId = ?";
         try (Connection conn = dbConnection.getConnection(); // Get a fresh connection
              PreparedStatement pstmt = conn.prepareStatement(insertQuery)) {
@@ -166,6 +188,8 @@ public class UserProfileController {
     public void saveOnAction(){
         this.saveUserProfile();
         this.displayUserProfile();
+        Stage stage = (Stage) txtUserName.getScene().getWindow();
+        stage.close();  // Closes the current window
     }
 
     private int getQuestionID(String question, String tableName, String questionColumn, String idColumn, Connection connectDB) {
@@ -211,7 +235,42 @@ public class UserProfileController {
 
         return true;
     }
+    public void verifyAnswers() {
+        String email = txtEmail.getText();
+        String answer1 = txtA1.getText();
+        String answer2 = txtA2.getText();
 
+        if (email.isEmpty() || answer1.isEmpty() || answer2.isEmpty()) {
+            lblMsg.setText("Please fill in all fields for verification.");
+            return;
+        }
+
+        try {
+            DataBaseConnection connectNow = new DataBaseConnection();
+            Connection connectDB = connectNow.getConnection();
+            String query = "SELECT Answer_1, Answer_2 FROM useraccount WHERE emailAddress = ?";
+            PreparedStatement pst = connectDB.prepareStatement(query);
+            pst.setString(1, email);
+            ResultSet rs = pst.executeQuery();
+
+            if (rs.next()) {
+                String storedAnswer1 = rs.getString("Answer_1");
+                String storedAnswer2 = rs.getString("Answer_2");
+
+                if (BCrypt.checkpw(answer1, storedAnswer1) && BCrypt.checkpw(answer2, storedAnswer2)) {
+                    lblMsg.setText("Your answers are correct. You can now reset your password.");
+                    btnSave.setDisable(false); // Enable reset button if answers are correct
+                } else {
+                    lblMsg.setText("Incorrect answers. Please try again.");
+                }
+            } else {
+                lblMsg.setText("No account associated with this email.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            lblMsg.setText("Error verifying answers: " + e.getMessage());
+        }
+    }
     private boolean usernameExists(String username) {
         return exists("userName", username);
     }
@@ -268,6 +327,9 @@ public class UserProfileController {
         if (btnSave != null) {
             btnSave.setStyle("-fx-background-color: " + buttonHex + "; -fx-text-fill: " + textHex + ";");
         }
+        if (btnVerify != null) {
+            btnVerify.setStyle("-fx-background-color: " + buttonHex + "; -fx-text-fill: " + textHex + ";");
+        }
         if (radbAdm != null) {
             radbAdm.setStyle(" -fx-text-fill: " + textHex + ";");
         }
@@ -317,6 +379,35 @@ public class UserProfileController {
     private String getHexColor(Color color) {
         return String.format("#%02x%02x%02x", (int) (color.getRed() * 255),
                 (int) (color.getGreen() * 255), (int) (color.getBlue() * 255));
+    }
+
+    public void applyModeColors() {
+        if (lblBkGrd == null) {
+            System.out.println("lblBkGrd is null!");
+            return;
+        }
+
+        String currentMode = AppSettings.getCurrentMode();
+        double opacity = AppSettings.MODE_AUTO.equals(currentMode) ? 0.0 : 0.5; // 0% for auto, 70% for others
+
+        updateLabelBackgroundColor(opacity);
+    }
+
+    public void updateLabelBackgroundColor(double opacity) {
+        if (lblBkGrd == null) {
+            System.out.println("lblBkGrd is null!");
+            return;
+        }
+        Color backgroundColor = AppSettings.getCurrentModeColorWithOpacity(opacity);
+        lblBkGrd.setStyle("-fx-background-color: " + toRgbaColor(backgroundColor) + ";");
+    }
+
+    private String toRgbaColor(Color color) {
+        return String.format("rgba(%d, %d, %d, %.2f)",
+                (int) (color.getRed() * 255),
+                (int) (color.getGreen() * 255),
+                (int) (color.getBlue() * 255),
+                color.getOpacity());
     }
 }
 

@@ -39,7 +39,7 @@ public class WellBeingController {
     private Scene scene;
     public Stage stage;
 
-    private void switchToMainMenuScene(ActionEvent e, String firstName, String accType, int userId) {
+    private void switchToMainMenuScene(ActionEvent e, String firstName, String accType, int userId, String source) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/cab302/wellbeing/MainMenu.fxml"));
             Parent root = loader.load();
@@ -47,8 +47,9 @@ public class WellBeingController {
             MainMenuController mainMenuController = loader.getController();
             mainMenuController.displayName(firstName);
             mainMenuController.setFirstName(firstName);
-            mainMenuController.setUserId(userId);
+            mainMenuController.setUserId(userId, source);
             mainMenuController.setAccType(accType);
+            mainMenuController.applyModeColors();
 
             //Scene scene = new Scene(root);
             Stage stage;
@@ -114,11 +115,8 @@ public class WellBeingController {
                 if (BCrypt.checkpw(password, storedHash)) {
                     lblLoginMsg.setText("Welcome " + firstName);
                     UserSession.getInstance().setCurrentUserId(userId);
-
-                    PauseTransition delay = new PauseTransition(Duration.seconds(0.1));
-                    delay.setOnFinished(event -> switchToMainMenuScene(e, firstName, accType, userId));  // `e` can be `null`
-                    delay.play();
-
+                    UserSession.getInstance().setFirstName(firstName);
+                    switchToMainMenuScene(e, firstName, accType, userId, "login");
                 } else {
                     lblLoginMsg.setText("Your username or password is wrong");
                 }

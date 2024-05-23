@@ -1,5 +1,6 @@
 package com.cab302.wellbeing.controller;
 
+import com.cab302.wellbeing.AppSettings;
 import com.cab302.wellbeing.DataBaseConnection;
 import com.cab302.wellbeing.UserSession;
 import javafx.fxml.FXML;
@@ -13,7 +14,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-
 public class BrowsingHistoryController {
     @FXML
     public DatePicker startDatePicker, endDatePicker;
@@ -26,8 +26,8 @@ public class BrowsingHistoryController {
     @FXML
     public TextField txtUrl;
     @FXML
-    public Label lblGreeting, lblStart, lblEnd, lblWeb;
-    String firstName;
+    public Label lblGreeting, lblStart, lblEnd, lblWeb, lblBkGrd;
+    private String firstName;
     private int currentUserId; // Store the current user ID
     public void setFirstName(String firstName) {
         this.firstName = firstName;
@@ -35,6 +35,8 @@ public class BrowsingHistoryController {
 
     public void setUserId(int userId) {
         this.currentUserId = userId;
+        System.out.println("currentUserId: " + currentUserId);
+        System.out.println("firstName: " + firstName);
     }
     public void initialize() {
         // Set up the event handler for the Enter key in the txtUrl TextField
@@ -47,13 +49,11 @@ public class BrowsingHistoryController {
     public void loadHistory() {
         historyDisplayArea.clear();
 
-        boolean isFirstNameSet = false;
-
         LocalDate startDate = startDatePicker.getValue();
         LocalDate endDate = endDatePicker.getValue();
         String searchURL = txtUrl.getText();
-
         int currentUserId = UserSession.getInstance().getCurrentUserId();  // Retrieve current user ID
+        String firstName = UserSession.getInstance().getFirstName();  // Retrieve first name
 
         String query = "SELECT u.firstName, b.URL, b.StartTime, b.SessionDate, b.Duration " +
                 "FROM BrowsingData b " +
@@ -155,9 +155,32 @@ public class BrowsingHistoryController {
         return String.format("#%02x%02x%02x", (int) (color.getRed() * 255),
                 (int) (color.getGreen() * 255), (int) (color.getBlue() * 255));
     }
-//    @FXML
-//    private void closeCurrentWindow() {
-//        Stage stage = (Stage) btnClose.getScene().getWindow();
-//        stage.close();
-//    }
+    public void applyModeColors() {
+        if (lblBkGrd == null) {
+            System.out.println("lblBkGrd is null!");
+            return;
+        }
+
+        String currentMode = AppSettings.getCurrentMode();
+        double opacity = AppSettings.MODE_AUTO.equals(currentMode) ? 0.0 : 0.5; // 0% for auto, 70% for others
+
+        updateLabelBackgroundColor(opacity);
+    }
+
+    public void updateLabelBackgroundColor(double opacity) {
+        if (lblBkGrd == null) {
+            System.out.println("lblBkGrd is null!");
+            return;
+        }
+        Color backgroundColor = AppSettings.getCurrentModeColorWithOpacity(opacity);
+        lblBkGrd.setStyle("-fx-background-color: " + toRgbaColor(backgroundColor) + ";");
+    }
+
+    private String toRgbaColor(Color color) {
+        return String.format("rgba(%d, %d, %d, %.2f)",
+                (int) (color.getRed() * 255),
+                (int) (color.getGreen() * 255),
+                (int) (color.getBlue() * 255),
+                color.getOpacity());
+    }
 }

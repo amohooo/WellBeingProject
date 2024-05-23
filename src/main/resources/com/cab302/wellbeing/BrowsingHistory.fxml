@@ -11,6 +11,7 @@
 
 <AnchorPane fx:id="paneHistory" prefHeight="1076.0" prefWidth="1214.0" style="-fx-background-color: #009ee0;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cab302.wellbeing.controller.BrowsingHistoryController">
    <children>
+      <Label fx:id="lblBkGrd" layoutX="26.0" layoutY="98.0" style="-fx-background-color: #009ee0;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
       <TextField fx:id="txtUrl" layoutX="693.0" layoutY="42.0" promptText="e.g. www.google.com" AnchorPane.leftAnchor="693.0" AnchorPane.rightAnchor="195.0" AnchorPane.topAnchor="42.0" />
       <Label fx:id="lblStart" layoutX="26.0" layoutY="40.0" text="Start date:" textFill="WHITE">
          <font>

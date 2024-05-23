@@ -1,5 +1,6 @@
 package com.cab302.wellbeing.controller;
 
+import com.cab302.wellbeing.AppSettings;
 import com.cab302.wellbeing.DataBaseConnection;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
@@ -37,12 +38,24 @@ public class MediaController implements Initializable {
     private int userId;
     private static final Color DEFAULT_COLOR = Color.web("#009ee0");
     private static final Color DEFAULT_TEXT_COLOR = Color.web("#ffffff");
+    private String accType;
+    public void setUserType(String accType) {
+        this.accType = accType;
+        System.out.println("User type: " + accType);
+        if (accType.equals("General")) {
+            btnUpload.setDisable(true);
+            btnDelete.setDisable(true);
+        } else {
+            btnUpload.setDisable(false);
+            btnDelete.setDisable(false);
+        }
+    }
     public void setUserId(int userId) {
         this.userId = userId;  // Now you can use this userId to store browsing data linked to the user
     }
     @FXML private MediaView mediaView;
     @FXML private Button btnPlay, btnPause, btnStop, btnUpload, btnDelete, btnRFS, btnSelect;
-    @FXML private Label lblDuration, lblMedia;
+    @FXML private Label lblBkGrd, lblDuration, lblMedia;
     @FXML private Slider slider;
     @FXML
     private Pane paneMedia;
@@ -375,6 +388,35 @@ public class MediaController implements Initializable {
     private String getHexColor(Color color) {
         return String.format("#%02x%02x%02x", (int) (color.getRed() * 255),
                 (int) (color.getGreen() * 255), (int) (color.getBlue() * 255));
+    }
+
+    public void applyModeColors() {
+        if (lblBkGrd == null) {
+            System.out.println("lblBkGrd is null!");
+            return;
+        }
+
+        String currentMode = AppSettings.getCurrentMode();
+        double opacity = AppSettings.MODE_AUTO.equals(currentMode) ? 0.0 : 0.5; // 0% for auto, 70% for others
+
+        updateLabelBackgroundColor(opacity);
+    }
+
+    public void updateLabelBackgroundColor(double opacity) {
+        if (lblBkGrd == null) {
+            System.out.println("lblBkGrd is null!");
+            return;
+        }
+        Color backgroundColor = AppSettings.getCurrentModeColorWithOpacity(opacity);
+        lblBkGrd.setStyle("-fx-background-color: " + toRgbaColor(backgroundColor) + ";");
+    }
+
+    private String toRgbaColor(Color color) {
+        return String.format("rgba(%d, %d, %d, %.2f)",
+                (int) (color.getRed() * 255),
+                (int) (color.getGreen() * 255),
+                (int) (color.getBlue() * 255),
+                color.getOpacity());
     }
 
 }

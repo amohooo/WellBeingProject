@@ -1,11 +1,13 @@
 package com.cab302.wellbeing.controller;
 
+import com.cab302.wellbeing.AppSettings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -21,6 +23,7 @@ public class WellBeingTipsController {
     Button btnGoBack, btnVideo, btnOT;
     @FXML
     public Pane paneWebeTip;
+    public Label lblBkGrd;
     /**
      * This method is used to handle the video button click event.
      * It switches the scene to the video scene.
@@ -41,6 +44,10 @@ public class WellBeingTipsController {
         switchScene(event, SceneType.OTHERTIP);
     }
 
+    private String accType;
+    public void setUserType(String accType) {
+        this.accType = accType;
+    }
     /**
      * This enum is used to define the types of scenes that can be switched to.
      */
@@ -88,7 +95,15 @@ public class WellBeingTipsController {
             if (sceneType == SceneType.MEDIA) {
                 MediaController controller = fxmlLoader.getController();
                 controller.setUserId(userId);  // Pass the user ID to the InternetExplorer controller
+                controller.setUserType(accType);
                 controller.applyColors(backgroundColor, textColor, buttonColor);
+                controller.applyModeColors();
+            }
+            if (sceneType == SceneType.OTHERTIP) {
+                OtherTipsController controller = fxmlLoader.getController();
+                controller.setUserId(userId);  // Pass the user ID to the InternetExplorer controller
+                controller.setFirstName(firstName);
+                controller.applyModeColors();
             }
             if (sceneType == SceneType.OTHERTIP) {
                 OtherTipsController controller = fxmlLoader.getController();
@@ -127,6 +142,35 @@ public class WellBeingTipsController {
     private String getHexColor(Color color) {
         return String.format("#%02x%02x%02x", (int) (color.getRed() * 255),
                 (int) (color.getGreen() * 255), (int) (color.getBlue() * 255));
+    }
+
+    public void applyModeColors() {
+        if (lblBkGrd == null) {
+            System.out.println("lblBkGrd is null!");
+            return;
+        }
+
+        String currentMode = AppSettings.getCurrentMode();
+        double opacity = AppSettings.MODE_AUTO.equals(currentMode) ? 0.0 : 0.5; // 0% for auto, 70% for others
+
+        updateLabelBackgroundColor(opacity);
+    }
+
+    public void updateLabelBackgroundColor(double opacity) {
+        if (lblBkGrd == null) {
+            System.out.println("lblBkGrd is null!");
+            return;
+        }
+        Color backgroundColor = AppSettings.getCurrentModeColorWithOpacity(opacity);
+        lblBkGrd.setStyle("-fx-background-color: " + toRgbaColor(backgroundColor) + ";");
+    }
+
+    private String toRgbaColor(Color color) {
+        return String.format("rgba(%d, %d, %d, %.2f)",
+                (int) (color.getRed() * 255),
+                (int) (color.getGreen() * 255),
+                (int) (color.getBlue() * 255),
+                color.getOpacity());
     }
     public void btnGoBackOnAction(ActionEvent e){
         Stage stage = (Stage) btnGoBack.getScene().getWindow();

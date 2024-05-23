@@ -1,5 +1,6 @@
 package com.cab302.wellbeing;
 
+import javafx.scene.paint.Color;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.*;
@@ -16,6 +17,15 @@ public class DataBaseConnection {
     private static final String ENV_DATABASE_USER = System.getenv("DB_USER");
     private static final String ENV_DATABASE_PASSWORD = System.getenv("DB_PASS");
     public Connection databaseLink;
+
+    private static DataBaseConnection instance;
+
+    public static DataBaseConnection getInstance() {
+        if (instance == null) {
+            instance = new DataBaseConnection();
+        }
+        return instance;
+    }
 
     public void createDatabase() {
         try (Connection conn = DriverManager.getConnection(DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD);
@@ -114,20 +124,11 @@ public class DataBaseConnection {
                 + "LimitType VARCHAR(50) NOT NULL, "
                 + "LimitValue INT NOT NULL, "
                 + "Active BOOLEAN NOT NULL DEFAULT TRUE, "
-                + "FOREIGN KEY (UserID) REFERENCES useraccount(userId)"
+                + "RemainingTime INT, "
+                + "FOREIGN KEY (UserID) REFERENCES useraccount(userId),"
+                + "UNIQUE (UserID, LimitType)"
                 + ")";
         statement.executeUpdate(createLimitsTableQuery);
-//
-//        String createNotificationsTableQuery = "CREATE TABLE IF NOT EXISTS Notifications ("
-//                + "NotificationID INT AUTO_INCREMENT PRIMARY KEY, "
-//                + "UserID INT NOT NULL, "
-//                + "NotificationType VARCHAR(50) NOT NULL, "
-//                + "Message TEXT NOT NULL, "
-//                + "DateSent DATETIME DEFAULT CURRENT_TIMESTAMP, "
-//                + "IsRead BOOLEAN NOT NULL DEFAULT FALSE, "
-//                + "FOREIGN KEY (UserID) REFERENCES useraccount(userId)"
-//                + ")";
-//        statement.executeUpdate(createNotificationsTableQuery);
 
         String createContactUsTableQuery = "CREATE TABLE IF NOT EXISTS ContactUs ("
                 + "ContactUsID INT AUTO_INCREMENT PRIMARY KEY, "
@@ -149,6 +150,17 @@ public class DataBaseConnection {
                 + "FOREIGN KEY (UserID) REFERENCES useraccount(userId)"
                 + ")";
         statement.executeUpdate(createColorSettingsTableQuery);
+
+        String createModeTableQuery = "CREATE TABLE IF NOT EXISTS Mode ("
+                + "UserID INT PRIMARY KEY, "
+                + "Mode VARCHAR(255) NOT NULL, "
+                + "Red INT NOT NULL, "
+                + "Green INT NOT NULL, "
+                + "Blue INT NOT NULL, "
+                + "Opacity DOUBLE NOT NULL, "
+                + "FOREIGN KEY (UserID) REFERENCES useraccount(userId)"
+                + ")";
+        statement.executeUpdate(createModeTableQuery);
 
         createMediaFilesTable(statement);
 
@@ -366,28 +378,6 @@ public class DataBaseConnection {
             e.printStackTrace();
         }
     }
-    private void insertDefaultColorSettings() {
-        String insertDefaultColorSettingsQuery = "INSERT INTO ColorSettings (ID, UserID, BackgroundColor, TextColor, ButtonColor, ButtonTextColor) "
-                + "VALUES (?, ?, ?, ?, ?, ?) "
-                + "ON DUPLICATE KEY UPDATE "
-                + "BackgroundColor = VALUES(BackgroundColor), "
-                + "TextColor = VALUES(TextColor), "
-                + "ButtonColor = VALUES(ButtonColor), "
-                + "ButtonTextColor = VALUES(ButtonTextColor)";
-        try (PreparedStatement preparedStatement = getConnection().prepareStatement(insertDefaultColorSettingsQuery)) {
-            preparedStatement.setInt(1, 1); // ID for default color settings row
-            preparedStatement.setInt(2, 1); // Assuming user ID 1 exists in useraccount table
-            preparedStatement.setString(3, "#009ee0"); // Default background color
-            preparedStatement.setString(4, "#ffffff"); // Default text color
-            preparedStatement.setString(5, "#009ee0"); // Default button color
-            preparedStatement.setString(6, "#ffffff"); // Default button text color
-            preparedStatement.executeUpdate();
-            System.out.println("Default color settings inserted or updated.");
-        } catch (SQLException e) {
-            System.err.println("Error inserting default color settings: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
 
     // Utility method to hash a password
     public String hashPassword(String password) {
@@ -400,6 +390,58 @@ public class DataBaseConnection {
         insertQuestions2();
         insertUser();
         insertRegistrationCode();
-        insertDefaultColorSettings();
+        //insertDefaultColorSettings();
+    }
+
+    public void saveUserMode(int userId, String mode) {
+        getConnection(); // Ensure the database connection is established
+
+        Color color = AppSettings.getCurrentModeColorForMode(mode); // Get the color for the current mode
+
+        String query = "INSERT INTO Mode (userId, mode, Red, Green, Blue, Opacity) VALUES (?, ?, ?, ?, ?, ?) "
+                + "ON DUPLICATE KEY UPDATE mode = VALUES(mode), Red = VALUES(Red), Green = VALUES(Green), Blue = VALUES(Blue), Opacity = VALUES(Opacity)";
+        try (PreparedStatement pstmt = databaseLink.prepareStatement(query)) {
+            pstmt.setInt(1, userId);
+            pstmt.setString(2, mode);
+            pstmt.setInt(3, (int) (color.getRed() * 255));
+            pstmt.setInt(4, (int) (color.getGreen() * 255));
+            pstmt.setInt(5, (int) (color.getBlue() * 255));
+            double opacity = color.getOpacity();
+            System.out.println("Setting opacity: " + opacity); // Debug print
+            pstmt.setDouble(6, opacity);
+            pstmt.executeUpdate();
+            System.out.println("User mode and color inserted successfully.");
+        } catch (SQLException e) {
+            System.err.println("Error inserting user mode and color: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public String getUserMode(int userId) {
+        getConnection(); // Ensure the database connection is established
+
+        String query = "SELECT Mode, Red, Green, Blue, Opacity FROM Mode WHERE UserID = ?";
+        try (PreparedStatement pstmt = databaseLink.prepareStatement(query)) {
+            pstmt.setInt(1, userId);
+            ResultSet resultSet = pstmt.executeQuery();
+            if (resultSet.next()) {
+                String mode = resultSet.getString("Mode");
+                int red = resultSet.getInt("Red");
+                int green = resultSet.getInt("Green");
+                int blue = resultSet.getInt("Blue");
+                double opacity = resultSet.getDouble("Opacity");
+                System.out.println("Retrieved opacity: " + opacity); // Debug print
+
+                // Set the current mode color based on retrieved values
+                Color retrievedColor = Color.rgb(red, green, blue, opacity);
+                AppSettings.setCurrentModeColor(mode, retrievedColor);
+
+                return mode;
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving user mode and color: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
     }
 }

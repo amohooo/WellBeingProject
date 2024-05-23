@@ -1,27 +1,18 @@
 package com.cab302.wellbeing.controller;
 
 import com.cab302.wellbeing.AppSettings;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 
-/**
- * This class is a controller for the Mode functionality in the application.
- * It provides methods to handle the mode (Dark, Light or Auto) of the application.
- */
 public class ModeController {
 
     @FXML
@@ -34,6 +25,8 @@ public class ModeController {
     private CheckBox eyeProtectCheckBox;
     @FXML
     private Pane paneMode;
+    @FXML
+    private Label lblBkGrd;
 
     @FXML
     public Button btnSaveM;
@@ -46,6 +39,12 @@ public class ModeController {
     @FXML
     private ToggleGroup modeGroup;
 
+    @FXML
+    public void initialize() {
+        setUpEventHandlers();
+        applyCurrentMode();
+    }
+
     public void setFirstName(String firstName) {
         this.firstName = firstName;
         System.out.println("firstName: " + firstName);
@@ -55,127 +54,103 @@ public class ModeController {
         this.userId = userId;
         System.out.println("userId: " + userId);
     }
-    @FXML
-    public void initialize() {
-        modeGroup = new ToggleGroup();
-        lightRadioButton.setToggleGroup(modeGroup);
-        nightRadioButton.setToggleGroup(modeGroup);
-        autoRadioButton.setToggleGroup(modeGroup);
-
-        // Use a listener to apply the current mode once the scene is set
-        btnSaveM.sceneProperty().addListener(new ChangeListener<Scene>() {
-            @Override
-            public void changed(ObservableValue<? extends Scene> observable, Scene oldScene, Scene newScene) {
-                if (newScene != null) {
-                    applyCurrentMode(newScene);
-                }
-            }
-        });
+    public String accType;
+    public void setAccType(String accType) {
+        this.accType = accType;
     }
 
-    private void applyCurrentMode(Scene scene) {
+    private void applyCurrentMode() {
         String currentMode = AppSettings.getCurrentMode();
-        updateSceneStyle(scene, currentMode);
-    }
+        double opacity = AppSettings.MODE_AUTO.equals(currentMode) ? 0.0 : 0.7; // Default to 0% opacity for auto mode
 
-    private void updateSceneStyle(Scene scene, String currentMode) {
-        scene.getStylesheets().clear();
-        String stylesheet = null;
+        updateLabelBackgroundColor(opacity);
+
         switch (currentMode) {
-            case AppSettings.MODE_NIGHT:
-                stylesheet = getClass().getResource("/com/cab302/wellbeing/styles/night.css").toExternalForm();
-                break;
             case AppSettings.MODE_LIGHT:
-                stylesheet = getClass().getResource("/com/cab302/wellbeing/styles/light.css").toExternalForm();
+                lightRadioButton.setSelected(true);
+                break;
+            case AppSettings.MODE_NIGHT:
+                nightRadioButton.setSelected(true);
                 break;
             case AppSettings.MODE_AUTO:
-                stylesheet = getClass().getResource("/com/cab302/wellbeing/styles/auto.css").toExternalForm();
+                autoRadioButton.setSelected(true);
                 break;
             case AppSettings.MODE_EYEPROTECT:
-                stylesheet = getClass().getResource("/com/cab302/wellbeing/styles/eyeprotect.css").toExternalForm();
+                eyeProtectCheckBox.setSelected(true);
                 break;
-        }
-        if (stylesheet != null) {
-            scene.getStylesheets().add(stylesheet);
         }
     }
 
-    @FXML
-    public void handleModeSelection(ActionEvent event) {
-        Scene scene = lightRadioButton.getScene();
+    private void setUpEventHandlers() {
+        eyeProtectCheckBox.setOnAction(event -> handleModeSelection());
+        lightRadioButton.setOnAction(event -> handleModeSelection());
+        nightRadioButton.setOnAction(event -> handleModeSelection());
+        autoRadioButton.setOnAction(event -> handleModeSelection());
+    }
 
-        if (event.getSource() == eyeProtectCheckBox) {
+    public void handleModeSelection() {
+        String currentMode = AppSettings.MODE_AUTO; // Default mode
+
+        if (eyeProtectCheckBox.isSelected()) {
             modeGroup.selectToggle(null);
-            AppSettings.setCurrentMode(AppSettings.MODE_EYEPROTECT);
-        } else {
-            eyeProtectCheckBox.setSelected(false);
-            if (lightRadioButton.isSelected()) {
-                AppSettings.setCurrentMode(AppSettings.MODE_LIGHT);
-            } else if (nightRadioButton.isSelected()) {
-                AppSettings.setCurrentMode(AppSettings.MODE_NIGHT);
-            } else if (autoRadioButton.isSelected()) {
-                AppSettings.setCurrentMode(AppSettings.MODE_AUTO);
-            }
+            currentMode = AppSettings.MODE_EYEPROTECT;
+        } else if (lightRadioButton.isSelected()) {
+            currentMode = AppSettings.MODE_LIGHT;
+        } else if (nightRadioButton.isSelected()) {
+            currentMode = AppSettings.MODE_NIGHT;
+        } else if (autoRadioButton.isSelected()) {
+            currentMode = AppSettings.MODE_AUTO;
         }
-        updateSceneStyle(scene, AppSettings.getCurrentMode());
+
+        AppSettings.setCurrentMode(currentMode);
+        double opacity = AppSettings.MODE_AUTO.equals(currentMode) ? 0.0 : 0.7; // 0% for auto, 70% for others
+        if (eyeProtectCheckBox.isSelected() || lightRadioButton.isSelected() || nightRadioButton.isSelected()){
+            applyModeColors();
+        } else {
+            updateLabelBackgroundColor(0);
+        }
+    }
+
+    public void updateLabelBackgroundColor(double opacity) {
+        if (lblBkGrd == null) {
+            System.out.println("lblBkGrd is null!");
+            return;
+        }
+        Color backgroundColor = AppSettings.getCurrentModeColorWithOpacity(opacity);
+        lblBkGrd.setStyle("-fx-background-color: " + toRgbaColor(backgroundColor) + ";");
+    }
+
+    private String toRgbaColor(Color color) {
+        return String.format("rgba(%d, %d, %d, %.2f)",
+                (int) (color.getRed() * 255),
+                (int) (color.getGreen() * 255),
+                (int) (color.getBlue() * 255),
+                color.getOpacity());
     }
 
     @FXML
     public void btnSaveMOnAction(ActionEvent actionEvent) {
         saveSelectedMode();
-        applyModeToAllWindows();
+        switchToMainMenu("Mode");
+
         Stage stage = (Stage) btnSaveM.getScene().getWindow();
         stage.close();
-        switchToMainMenu();
-    }
-
-    private void applyModeToAllWindows() {
-        String currentMode = AppSettings.getCurrentMode();
-        String stylesheet = null;
-
-        switch (currentMode) {
-            case AppSettings.MODE_NIGHT:
-                stylesheet = getClass().getResource("/com/cab302/wellbeing/styles/night.css").toExternalForm();
-                break;
-            case AppSettings.MODE_LIGHT:
-                stylesheet = getClass().getResource("/com/cab302/wellbeing/styles/light.css").toExternalForm();
-                break;
-            case AppSettings.MODE_AUTO:
-                stylesheet = getClass().getResource("/com/cab302/wellbeing/styles/auto.css").toExternalForm();
-                break;
-            case AppSettings.MODE_EYEPROTECT:
-                stylesheet = getClass().getResource("/com/cab302/wellbeing/styles/eyeprotect.css").toExternalForm();
-                break;
-        }
-
-        for (Stage stage : Stage.getWindows().stream().filter(window -> window instanceof Stage).map(window -> (Stage) window).toList()) {
-            Scene scene = stage.getScene();
-            scene.getStylesheets().clear();
-            if (stylesheet != null) {
-                scene.getStylesheets().add(stylesheet);
-            }
-        }
     }
 
     private void saveSelectedMode() {
-        if (nightRadioButton.isSelected()) {
-            AppSettings.setCurrentMode(AppSettings.MODE_NIGHT);
-        } else if (lightRadioButton.isSelected()) {
-            AppSettings.setCurrentMode(AppSettings.MODE_LIGHT);
-        } else if (autoRadioButton.isSelected()) {
-            AppSettings.setCurrentMode(AppSettings.MODE_AUTO);
-        }
-        if (eyeProtectCheckBox.isSelected()) {
-            AppSettings.setCurrentMode(AppSettings.MODE_EYEPROTECT);
-        }
+        String selectedMode = AppSettings.getCurrentMode();
+        AppSettings.saveModeToDatabase(userId, selectedMode);
     }
-    private void switchToMainMenu() {
+
+    private void switchToMainMenu(String source) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/cab302/wellbeing/MainMenu.fxml"));
             Parent root = fxmlLoader.load();
             MainMenuController mainMenuController = fxmlLoader.getController();
             mainMenuController.setFirstName(firstName);
-            mainMenuController.setUserId(userId);
+            mainMenuController.setUserId(userId, source);
+            mainMenuController.setAccType(accType);
+            mainMenuController.applyModeColors();
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
             stage.setTitle("Main Menu");
@@ -184,12 +159,14 @@ public class ModeController {
             e.printStackTrace();
         }
     }
+
     @FXML
     public void btnCancelMOnAction(ActionEvent actionEvent) {
         Stage stage = (Stage) btnCancelM.getScene().getWindow();
+        stage.setOnHidden(event -> switchToMainMenu("Mode"));
         stage.close();
-        switchToMainMenu();
     }
+
     public void applyColors(Color backgroundColor, Color textColor, Color buttonColor) {
         String backgroundHex = getHexColor(backgroundColor);
         String textHex = getHexColor(textColor);
@@ -205,10 +182,10 @@ public class ModeController {
             nightRadioButton.setStyle("-fx-text-fill: " + textHex + ";");
         }
         if (autoRadioButton != null) {
-            autoRadioButton.setStyle(" -fx-text-fill: " + textHex + ";");
+            autoRadioButton.setStyle("-fx-text-fill: " + textHex + ";");
         }
         if (eyeProtectCheckBox != null) {
-            eyeProtectCheckBox.setStyle(" -fx-text-fill: " + textHex + ";");
+            eyeProtectCheckBox.setStyle("-fx-text-fill: " + textHex + ";");
         }
         if (btnSaveM != null) {
             btnSaveM.setStyle("-fx-background-color: " + buttonHex + "; -fx-text-fill: " + textHex + ";");
@@ -222,4 +199,16 @@ public class ModeController {
         return String.format("#%02x%02x%02x", (int) (color.getRed() * 255),
                 (int) (color.getGreen() * 255), (int) (color.getBlue() * 255));
     }
+    public void applyModeColors() {
+        if (lblBkGrd == null) {
+            System.out.println("lblBkGrd is null!");
+            return;
+        }
+
+        String currentMode = AppSettings.getCurrentMode();
+        double opacity = AppSettings.MODE_AUTO.equals(currentMode) ? 0.0 : 0.5; // 0% for auto, 70% for others
+
+        updateLabelBackgroundColor(opacity);
+    }
+
 }

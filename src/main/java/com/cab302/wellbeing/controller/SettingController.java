@@ -1,5 +1,6 @@
 package com.cab302.wellbeing.controller;
 
+import com.cab302.wellbeing.AppSettings;
 import com.cab302.wellbeing.DataBaseConnection;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -26,25 +27,48 @@ public class SettingController {
     public Label lblSetting;
     @FXML
     private AnchorPane paneSetting;
+    @FXML
+    private Label lblBkGrd;
     private DataBaseConnection dbConnection = new DataBaseConnection();
     private int userId;
     private String firstName;
+    private String accType;
+    public int hours;
+    public int minutes;
+    public int seconds;
+    public boolean active;
+    public String limitType;
     private static final Color DEFAULT_COLOR = Color.web("#009ee0");
     private static final Color DEFAULT_TEXT_COLOR = Color.web("#ffffff");
+
+    private static Color lightColor = Color.web("#bfe7f7");
+    private static Color nightColor = Color.web("#777777");
+    private static Color autoColor = Color.web("#009ee0");
+    private static Color eyeProtectColor = Color.web("#A3CCBE");
     private MainMenuController mainMenuController;
+
+    private static SettingController instance;
+    public static SettingController getInstance() {
+        if (instance == null) {
+            instance = new SettingController();
+        }
+        return instance;
+    }
+    public void setAccType(String accType) {
+        this.accType = accType;
+    }
     public void setFirstName(String firstName) {
         this.firstName = firstName;
-        System.out.println("firstName: " + firstName);
     }
-
     public void setUserId(int userId) {
         this.userId = userId;
         System.out.println("userId: " + userId);
+        System.out.println("accType: " + accType);
     }
     public void btnBackOnAction(ActionEvent e) {
         Stage stage = (Stage) btnBack.getScene().getWindow();
         stage.close();
-        switchToMainMenu();
+        switchToMainMenu("Setting");
     }
     @FXML
     private void handleModeButton(ActionEvent event) {
@@ -54,16 +78,22 @@ public class SettingController {
     private void handleSetTimeButton(ActionEvent event) {
         switchScene(event, SceneType.SETTIME);
     }
-
     @FXML
     private void handleThemeButton(ActionEvent event) {
         switchScene(event, SceneType.THEME);
     }
 
+    public void setTimeLimits(int hours, int minutes, int seconds, boolean active, String limitType) {
+        this.hours = hours;
+        this.minutes = minutes;
+        this.seconds = seconds;
+        this.active = active;
+        this.limitType = limitType;
+    }
+
     public enum SceneType {
         MODE, SETTIME, THEME
     }
-
     public void switchScene(ActionEvent event, SceneType sceneType) {
         String fxmlFile = "";
         String title = "TIPS";
@@ -102,22 +132,30 @@ public class SettingController {
                 controller.setUserId(userId);
                 controller.setParentController(this);
                 controller.setFirstName(firstName);
+                controller.setAccType(accType);
                 controller.setMainMenuController(mainMenuController);
                 controller.applyColors(backgroundColor, textColor, buttonColor);
+                controller.applyModeColors();
                 System.out.println("userId: " + userId);
             }
             if (sceneType == SceneType.MODE) {
                 ModeController controller = fxmlLoader.getController();
                 controller.setUserId(userId);
                 controller.setFirstName(firstName);
+                controller.setAccType(accType);
                 controller.applyColors(backgroundColor, textColor, buttonColor);
+                applyModeColors();
                 System.out.println("userId: " + userId);
             }
             if (sceneType == SceneType.SETTIME) {
                 SetTimeLimitController controller = fxmlLoader.getController();
                 controller.setUserId(userId);
                 controller.setFirstName(firstName);
+                controller.setAccType(accType);
+                System.out.println("accType: " + accType);
+                controller.setTimeLimits(hours, minutes, seconds, active, limitType);
                 controller.applyColors(backgroundColor, textColor, buttonColor);
+                controller.applyModeColors();
                 System.out.println("userId: " + userId);
             }
 
@@ -128,13 +166,14 @@ public class SettingController {
             e.printStackTrace();
         }
     }
-    private void switchToMainMenu() {
+    private void switchToMainMenu(String source) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/cab302/wellbeing/MainMenu.fxml"));
             Parent root = fxmlLoader.load();
             MainMenuController mainMenuController = fxmlLoader.getController();
             mainMenuController.setFirstName(firstName);
-            mainMenuController.setUserId(userId);
+            mainMenuController.setUserId(userId, source);
+            mainMenuController.applyModeColors();
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
             stage.setTitle("Main Menu");
@@ -171,5 +210,32 @@ public class SettingController {
     private String getHexColor(Color color) {
         return String.format("#%02x%02x%02x", (int) (color.getRed() * 255),
                 (int) (color.getGreen() * 255), (int) (color.getBlue() * 255));
+    }
+
+    public void applyModeColors() {
+        if (lblBkGrd == null) {
+            System.out.println("lblBkGrd is null!");
+            return;
+        }
+        String currentMode = AppSettings.getCurrentMode();
+        double opacity = AppSettings.MODE_AUTO.equals(currentMode) ? 0.0 : 0.5; // 0% for auto, 70% for others
+        updateLabelBackgroundColor(opacity);
+    }
+
+    public void updateLabelBackgroundColor(double opacity) {
+        if (lblBkGrd == null) {
+            System.out.println("lblBkGrd is null!");
+            return;
+        }
+        Color backgroundColor = AppSettings.getCurrentModeColorWithOpacity(opacity);
+        lblBkGrd.setStyle("-fx-background-color: " + toRgbaColor(backgroundColor) + ";");
+    }
+
+    private String toRgbaColor(Color color) {
+        return String.format("rgba(%d, %d, %d, %.2f)",
+                (int) (color.getRed() * 255),
+                (int) (color.getGreen() * 255),
+                (int) (color.getBlue() * 255),
+                color.getOpacity());
     }
 }
