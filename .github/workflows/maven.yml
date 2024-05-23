@@ -20,10 +20,6 @@ jobs:
         distribution: 'corretto'
         cache: maven
 
-    - name: Increase Node Memory Limit
-      run: echo "export NODE_OPTIONS=--max_old_space_size=4096" >> $GITHUB_ENV
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
     - name: Xvfb setup
       run: sudo apt-get install xvfb
     - name: Start Xvfb
@@ -32,3 +28,8 @@ jobs:
       env:
         DISPLAY: :99
       run: mvn test
+    - name: Increase Node Memory Limit
+      run: echo "export NODE_OPTIONS=--max_old_space_size=4096" >> $GITHUB_ENV
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
+
