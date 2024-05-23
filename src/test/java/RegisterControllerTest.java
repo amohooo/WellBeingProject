@@ -46,25 +46,9 @@ public class RegisterControllerTest {
     @BeforeEach
     public void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
-        Platform.runLater(() -> {
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/cab302/wellbeing/Register.fxml"));
-                Parent root = loader.load();
-                registerController = loader.getController();
-
-                Scene scene = new Scene(root);
-                Stage mockStage = new Stage();
-                mockStage.setScene(scene);
-                mockStage.show();
-
-                when(mockDataBaseConnection.getConnection()).thenReturn(mockConnection);
-                when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
-
-                setInitialData();
-            } catch (IOException | SQLException e) {
-                fail("Failed to load FXML or initialize the controller: " + e.getMessage());
-            }
-        });
+        when(mockDataBaseConnection.getConnection()).thenReturn(mockConnection);
+        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
+        setInitialData();
     }
 
     private void setInitialData() {
