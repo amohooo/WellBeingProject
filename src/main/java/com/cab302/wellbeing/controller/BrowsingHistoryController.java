@@ -28,7 +28,7 @@ public class BrowsingHistoryController {
     @FXML
     public Label lblGreeting, lblStart, lblEnd, lblWeb, lblBkGrd;
     private String firstName;
-    private int currentUserId; // Store the current user ID
+    private int currentUserId;
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
