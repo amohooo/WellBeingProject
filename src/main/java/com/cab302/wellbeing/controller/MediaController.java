@@ -1,6 +1,7 @@
 package com.cab302.wellbeing.controller;
 
-import com.cab302.wellbeing.*;
+import com.cab302.wellbeing.model.AppSettings;
+import com.cab302.wellbeing.model.DataBaseConnection;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -221,6 +222,21 @@ public class MediaController implements Initializable {
                 // Delete from database
                 pstmtDelete.setString(1, fileName);
                 pstmtDelete.setInt(2, userId);
+                int rowsDeleted = pstmtDelete.executeUpdate();
+                if (rowsDeleted > 0) {
+                    System.out.println("File deleted from database: " + fileName);
+                } else {
+                    System.err.println("Failed to delete file from database: " + fileName);
+                    return;
+                }
+
+                // Delete the file from local storage
+                File file = new File(filePath);
+                if (file.exists() && file.delete()) {
+                    System.out.println("File deleted from local storage: " + filePath);
+                } else {
+                    System.err.println("Failed to delete file from local storage: " + filePath);
+                }
 
                 refreshMediaList();
 

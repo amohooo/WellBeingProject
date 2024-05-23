@@ -1,4 +1,4 @@
-module com.cab302.wellbeing {
+module com.cab302.wellbeing.model {
     requires javafx.controls;
     requires javafx.fxml;
     requires java.sql;
@@ -12,7 +12,8 @@ module com.cab302.wellbeing {
     requires javafx.swing;
 
     opens com.cab302.wellbeing to javafx.fxml;
-    exports com.cab302.wellbeing;
+    exports com.cab302.wellbeing.model;
     exports com.cab302.wellbeing.controller;
     opens com.cab302.wellbeing.controller to javafx.fxml;
+    opens com.cab302.wellbeing.model to javafx.fxml;
 }

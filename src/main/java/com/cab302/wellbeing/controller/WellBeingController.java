@@ -1,7 +1,7 @@
 package com.cab302.wellbeing.controller;
 
-import com.cab302.wellbeing.*;
-import com.cab302.wellbeing.UserSession;
+import com.cab302.wellbeing.model.DataBaseConnection;
+import com.cab302.wellbeing.model.UserSession;
 import javafx.animation.PauseTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -145,7 +145,7 @@ public class WellBeingController {
     }
     private void openPasswordResetScene() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/cab302/wellbeing/PasswordReset.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("com/cab302/wellbeing/PasswordReset.fxml"));
             Parent root = loader.load();
             Scene scene = new Scene(root);
             Stage stage = new Stage();

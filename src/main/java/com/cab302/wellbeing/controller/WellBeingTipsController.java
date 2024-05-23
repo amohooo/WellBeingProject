@@ -1,6 +1,6 @@
 package com.cab302.wellbeing.controller;
 
-import com.cab302.wellbeing.*;
+import com.cab302.wellbeing.model.AppSettings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

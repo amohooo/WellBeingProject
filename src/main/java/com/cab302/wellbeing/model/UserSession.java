@@ -1,4 +1,4 @@
-package com.cab302.wellbeing;
+package com.cab302.wellbeing.model;
 import java.util.HashMap;
 import java.util.Map;
 

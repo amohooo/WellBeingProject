@@ -1,7 +1,7 @@
 package com.cab302.wellbeing.controller;
 
-import com.cab302.wellbeing.*;
-import com.cab302.wellbeing.DataBaseConnection;
+import com.cab302.wellbeing.model.AppSettings;
+import com.cab302.wellbeing.model.DataBaseConnection;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

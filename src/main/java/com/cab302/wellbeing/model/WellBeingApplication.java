@@ -1,4 +1,4 @@
-package com.cab302.wellbeing;
+package com.cab302.wellbeing.model;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -12,7 +12,7 @@ public class WellBeingApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         try{
-            Parent root = FXMLLoader.load(getClass().getResource("login.fxml"));
+            Parent root = FXMLLoader.load(getClass().getResource("/com/cab302/wellbeing/login.fxml"));
             Scene scene = new Scene(root);
 
             stage.setTitle("Well Being");

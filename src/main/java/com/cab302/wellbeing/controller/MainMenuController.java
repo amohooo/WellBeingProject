@@ -1,6 +1,7 @@
 package com.cab302.wellbeing.controller;
 
-import com.cab302.wellbeing.*;
+import com.cab302.wellbeing.model.AppSettings;
+import com.cab302.wellbeing.model.DataBaseConnection;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -475,7 +476,7 @@ public class MainMenuController {
                 stage.close();
 
                 // Load and display the login page
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/cab302/wellbeing/Login.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/cab302/wellbeing/login.fxml"));
                 Parent root = loader.load();
                 Stage loginStage = new Stage();
                 loginStage.setTitle("Login");
