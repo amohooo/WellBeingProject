@@ -1,0 +1,15 @@
+.chart-bar {
+    -fx-bar-fill: #3498db; /* Adjust the color as needed */
+}
+
+.axis-label {
+    -fx-font-size: 20px; /* Adjust the font size as needed */
+}
+
+.chart-legend-item {
+    -fx-font-size: 20px; /* Adjust the legend font size as needed */
+}
+
+.axis {
+    -fx-tick-label-font-size: 20px; /* Adjust the font size of the axis tick labels */
+}
