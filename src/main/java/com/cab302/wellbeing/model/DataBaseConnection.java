@@ -1,6 +1,5 @@
 package com.cab302.wellbeing.model;
 
-import com.cab302.wellbeing.controller.AppSettings;
 import javafx.scene.paint.Color;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -392,57 +391,5 @@ public class DataBaseConnection {
         insertUser();
         insertRegistrationCode();
         //insertDefaultColorSettings();
-    }
-
-    public void saveUserMode(int userId, String mode) {
-        getConnection(); // Ensure the database connection is established
-
-        Color color = AppSettings.getCurrentModeColorForMode(mode); // Get the color for the current mode
-
-        String query = "INSERT INTO Mode (userId, mode, Red, Green, Blue, Opacity) VALUES (?, ?, ?, ?, ?, ?) "
-                + "ON DUPLICATE KEY UPDATE mode = VALUES(mode), Red = VALUES(Red), Green = VALUES(Green), Blue = VALUES(Blue), Opacity = VALUES(Opacity)";
-        try (PreparedStatement pstmt = databaseLink.prepareStatement(query)) {
-            pstmt.setInt(1, userId);
-            pstmt.setString(2, mode);
-            pstmt.setInt(3, (int) (color.getRed() * 255));
-            pstmt.setInt(4, (int) (color.getGreen() * 255));
-            pstmt.setInt(5, (int) (color.getBlue() * 255));
-            double opacity = color.getOpacity();
-            System.out.println("Setting opacity: " + opacity); // Debug print
-            pstmt.setDouble(6, opacity);
-            pstmt.executeUpdate();
-            System.out.println("User mode and color inserted successfully.");
-        } catch (SQLException e) {
-            System.err.println("Error inserting user mode and color: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    public String getUserMode(int userId) {
-        getConnection(); // Ensure the database connection is established
-
-        String query = "SELECT Mode, Red, Green, Blue, Opacity FROM Mode WHERE UserID = ?";
-        try (PreparedStatement pstmt = databaseLink.prepareStatement(query)) {
-            pstmt.setInt(1, userId);
-            ResultSet resultSet = pstmt.executeQuery();
-            if (resultSet.next()) {
-                String mode = resultSet.getString("Mode");
-                int red = resultSet.getInt("Red");
-                int green = resultSet.getInt("Green");
-                int blue = resultSet.getInt("Blue");
-                double opacity = resultSet.getDouble("Opacity");
-                System.out.println("Retrieved opacity: " + opacity); // Debug print
-
-                // Set the current mode color based on retrieved values
-                Color retrievedColor = Color.rgb(red, green, blue, opacity);
-                AppSettings.setCurrentModeColor(mode, retrievedColor);
-
-                return mode;
-            }
-        } catch (SQLException e) {
-            System.err.println("Error retrieving user mode and color: " + e.getMessage());
-            e.printStackTrace();
-        }
-        return null;
     }
 }
