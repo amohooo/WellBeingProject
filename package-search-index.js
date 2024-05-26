@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"m":"com.cab302.wellbeing.model","l":"com.cab302.wellbeing.controller"},{"m":"com.cab302.wellbeing.model","l":"com.cab302.wellbeing.model"}];updateSearchResults();
