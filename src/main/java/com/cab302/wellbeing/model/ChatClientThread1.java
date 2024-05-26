@@ -9,12 +9,21 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.Socket;
 
+/**
+ * This class is a thread for the chat client.
+ * It provides methods to open, close, and run the client.
+ */
 public class ChatClientThread1 extends Thread {
-    private Socket socket;
-    private DeveloperController client1;
-    private DataInputStream streamIn;
-    private volatile boolean running = true;
+    private Socket socket; // The socket for the client
+    private DeveloperController client1; // The client controller
+    private DataInputStream streamIn; // The input stream for the client
+    private volatile boolean running = true; // The running state of the client
 
+    /**
+     * This method is used to initialize the chat client thread.
+     * @param _client1 - the client controller
+     * @param _socket - the socket for the client
+     */
     public ChatClientThread1(DeveloperController _client1, Socket _socket) {
         client1 = _client1;
         socket = _socket;
@@ -22,6 +31,9 @@ public class ChatClientThread1 extends Thread {
         start();
     }
 
+    /**
+     * This method is used to open the input stream for the client.
+     */
     public void open() {
         try {
             streamIn = new DataInputStream(socket.getInputStream());
@@ -31,6 +43,9 @@ public class ChatClientThread1 extends Thread {
         }
     }
 
+    /**
+     * This method is used to close the connection for the client.
+     */
     public void connClose() {
         running = false;
         try {
@@ -40,6 +55,9 @@ public class ChatClientThread1 extends Thread {
         }
     }
 
+    /**
+     * This method is used to run the client thread.
+     */
     public void run() {
         while (running) {
             try {

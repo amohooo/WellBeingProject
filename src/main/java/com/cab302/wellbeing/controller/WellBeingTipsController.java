@@ -19,11 +19,21 @@ import java.io.IOException;
  * It provides methods to handle button clicks and switch scenes.
  */
 public class WellBeingTipsController {
+    /**
+     * Button to go back, view video, and view other tips.
+     */
     @FXML
-    Button btnGoBack, btnVideo, btnOT;
+    public Button btnGoBack, btnVideo, btnOT; // Buttons to go back, view video, and view other tips
+    /**
+     * Pane for the web e-tip and label for the background.
+     */
     @FXML
-    public Pane paneWebeTip;
-    public Label lblBkGrd;
+    public Pane paneWebeTip; // Pane for the web e-tip
+    /**
+     * Label for the background.
+     */
+    @FXML
+    public Label lblBkGrd; // Label for the background
     /**
      * This method is used to handle the video button click event.
      * It switches the scene to the video scene.
@@ -44,22 +54,45 @@ public class WellBeingTipsController {
         switchScene(event, SceneType.OTHERTIP);
     }
 
-    private String accType;
+    private String accType; // The account type of the user
+
+    /**
+     * This method is used to set the account type of the user.
+     * @param accType - the account type of the user
+     */
     public void setUserType(String accType) {
         this.accType = accType;
     }
     /**
-     * This enum is used to define the types of scenes that can be switched to.
+     * Represents the type of scenes that can be switched to.
+     * The scene type can be either MEDIA or OTHERTIP.
      */
     public enum SceneType {
-        MEDIA, OTHERTIP
+        /**
+         * Represents the media scene type.
+         */
+        MEDIA,
+
+        /**
+         * Represents the other tip scene type.
+         */
+        OTHERTIP
     }
-    private int userId;
-    private String firstName;
+    private int userId; // The user ID
+    private String firstName; // The first name of the user
+
+    /**
+     * This method is used to set the user ID.
+     * @param userId - the user ID
+     */
     public void setUserId(int userId) {
-        this.userId = userId;  // Now you can use this userId to store browsing data linked to the user
-        //loadSavedColors();
+        this.userId = userId;  // Use this userId to store browsing data linked to the user
     }
+
+    /**
+     * This method is used to set the first name of the user.
+     * @param firstName - the first name of the user
+     */
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
@@ -76,7 +109,7 @@ public class WellBeingTipsController {
         Color backgroundColor = (Color) paneWebeTip.getBackground().getFills().get(0).getFill();
         Color textColor = (Color) btnOT.getTextFill();
         Color buttonColor = (Color) btnGoBack.getBackground().getFills().get(0).getFill();
-
+        // Set the fxml file based on the scene type
         switch (sceneType) {
             case MEDIA:
                 fxmlFile = "/com/cab302/wellbeing/Media.fxml";
@@ -88,6 +121,7 @@ public class WellBeingTipsController {
                 System.err.println("Unsupported scene type: " + sceneType);
                 return;
         }
+        // Load the fxml file and display it in a new window
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(fxmlFile));
             Parent root1 = fxmlLoader.load();
@@ -120,6 +154,12 @@ public class WellBeingTipsController {
         }
     }
 
+    /**
+     * This method is used to apply the colors.
+     * @param backgroundColor - the background color to apply
+     * @param textColor - the text color to apply
+     * @param buttonColor - the button color to apply
+     */
     public void applyColors(Color backgroundColor, Color textColor, Color buttonColor) {
         String backgroundHex = getHexColor(backgroundColor);
         String textHex = getHexColor(textColor);
@@ -139,11 +179,19 @@ public class WellBeingTipsController {
         }
     }
 
+    /**
+     * This method is used to get the hexadecimal color value.
+     * @param color - the color to get the hexadecimal value for
+     * @return the hexadecimal color value
+     */
     private String getHexColor(Color color) {
         return String.format("#%02x%02x%02x", (int) (color.getRed() * 255),
                 (int) (color.getGreen() * 255), (int) (color.getBlue() * 255));
     }
 
+    /**
+     * This method is used to apply the mode colors.
+     */
     public void applyModeColors() {
         if (lblBkGrd == null) {
             System.out.println("lblBkGrd is null!");
@@ -156,6 +204,10 @@ public class WellBeingTipsController {
         updateLabelBackgroundColor(opacity);
     }
 
+    /**
+     * This method is used to update the label background color.
+     * @param opacity - the opacity to apply
+     */
     public void updateLabelBackgroundColor(double opacity) {
         if (lblBkGrd == null) {
             System.out.println("lblBkGrd is null!");
@@ -165,6 +217,11 @@ public class WellBeingTipsController {
         lblBkGrd.setStyle("-fx-background-color: " + toRgbaColor(backgroundColor) + ";");
     }
 
+    /**
+     * This method is used to convert the color to an RGBA color string.
+     * @param color - the color to convert
+     * @return the RGBA color string
+     */
     private String toRgbaColor(Color color) {
         return String.format("rgba(%d, %d, %d, %.2f)",
                 (int) (color.getRed() * 255),
@@ -172,6 +229,12 @@ public class WellBeingTipsController {
                 (int) (color.getBlue() * 255),
                 color.getOpacity());
     }
+
+    /**
+     * This method is used to handle the go back button click event.
+     * It closes the current stage.
+     * @param e - the action event that triggered the method
+     */
     public void btnGoBackOnAction(ActionEvent e){
         Stage stage = (Stage) btnGoBack.getScene().getWindow();
         stage.close();

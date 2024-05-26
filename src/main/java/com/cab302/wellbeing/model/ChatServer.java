@@ -7,13 +7,21 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+/**
+ * This class is a thread for the chat server.
+ * It provides methods to open, close, and run the server.
+ */
 public class ChatServer implements Runnable {
-    private ChatServerThread[] clients = new ChatServerThread[50];
-    private ServerSocket server = null;
-    private Thread thread = null;
-    private int clientCount = 0;
-    private volatile boolean running = true;
+    private ChatServerThread[] clients = new ChatServerThread[50]; // An array of client threads
+    private ServerSocket server = null; // The server socket
+    private Thread thread = null; // The server thread
+    private int clientCount = 0; // The number of clients
+    private volatile boolean running = true; // The running state of the server
 
+    /**
+     * This method is used to initialize the chat server.
+     * @param port - the port for the server
+     */
     public ChatServer(int port) {
         try {
             System.out.println("Binding to port " + port + ", please wait  ...");
@@ -24,6 +32,9 @@ public class ChatServer implements Runnable {
         }
     }
 
+    /**
+     * This method is used to start the server thread.
+     */
     public void run() {
         while (running) {
             try {
@@ -38,6 +49,9 @@ public class ChatServer implements Runnable {
         }
     }
 
+    /**
+     * This method is used to stop the server thread.
+     */
     public void stop() {
         running = false;
         if (thread != null) {
@@ -52,6 +66,10 @@ public class ChatServer implements Runnable {
         }
     }
 
+    /**
+     * This method is used to find the Client.
+     * @param ID - the client socket
+     */
     private synchronized int findClient(int ID) {
         for (int i = 0; i < clientCount; i++) {
             if (clients[i].getID() == ID) {
@@ -61,6 +79,11 @@ public class ChatServer implements Runnable {
         return -1;
     }
 
+    /**
+     * This method is used to synchronize the server thread.
+     * @param ID - the client ID
+     * @param input - the input from the client
+     */
     public synchronized void handle(int ID, String input) {
         if (input.equals(".bye")) {
             clients[findClient(ID)].send(".bye");
@@ -72,6 +95,10 @@ public class ChatServer implements Runnable {
         }
     }
 
+    /**
+     * This method is used to remove the server thread.
+     * @param ID - the client ID
+     */
     public synchronized void remove(int ID) {
         int pos = findClient(ID);
         if (pos >= 0) {
@@ -87,6 +114,10 @@ public class ChatServer implements Runnable {
         }
     }
 
+    /**
+     * This method is used to add Thread.
+     * @param socket - the client socket
+     */
     private void addThread(Socket socket) {
         if (clientCount < clients.length) {
             System.out.println("Client accepted: " + socket);

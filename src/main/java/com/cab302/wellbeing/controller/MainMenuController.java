@@ -23,71 +23,125 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
 
-
+/**
+ * This class is responsible for controlling the main menu.
+ * It provides functionalities such as switching scenes, logging out, and applying color themes.
+ */
 public class MainMenuController {
+    /**
+     * Button for btnLogOut, btnExplorer, btnReport, btnWebe, btnUser, btnSetting, btnContact
+     */
     @FXML
-    public Button btnLogOut, btnExplorer, btnReport, btnWebe, btnUser, btnSetting, btnContact;
+    public Button btnLogOut, btnExplorer, btnReport, btnWebe, btnUser, btnSetting, btnContact; // Buttons for logging out and switching scenes
+    /**
+     * Label for lblName
+     */
     @FXML
-    public Label lblName;
+    public Label lblName; // Label for the user's name
+    /**
+     * Pane for paneMenu
+     */
     @FXML
-    public Pane paneMenu;
+    public Pane paneMenu; // Pane for the menu
+    /**
+     * Label for lblBkGrd
+     */
+    @FXML
+    private Label lblBkGrd; // Label for the background
+    private int userId; // ID of the current user
+    private int remainingTime; // Remaining time in seconds
+    private String firstName; // First name of the user
+    private Timeline countdown; // Timeline for the countdown
+    private Timeline notificationTimeline; // Timeline for the notification
+    private int totalSeconds; // Total seconds for the countdown
+    private boolean notifySelected; // Whether the notification option is selected
+    private boolean askSelected; // Whether the ask option is selected
+    private boolean exitSelected; // Whether the exit option is selected
+    private String limitType; // Type of the time limit
+    private int limitValue; // Value of the time limit
+    private boolean active; // Whether the time limit is active
 
-    @FXML
-    private Label lblBkGrd;
-    private int userId;
-    private int remainingTime;
-    private String firstName;
-    private Timeline countdown;
-    private Timeline notificationTimeline;
-    private int totalSeconds;
-    private boolean notifySelected;
-    private boolean askSelected;
-    private boolean exitSelected;
-    private String limitType;
-    private int limitValue;
-    private boolean active;
+    private DataBaseConnection dbConnection = new DataBaseConnection(); // Database connection
+    private String accType; // Account type of the user
+    private static final Color DEFAULT_COLOR = Color.web("#009ee0"); // Default color for the menu
+    private static final Color DEFAULT_TEXT_COLOR = Color.web("#ffffff"); // Default text color for the menu
+    private static MainMenuController instance; // Singleton instance
 
-    private DataBaseConnection dbConnection = new DataBaseConnection();
-    private String accType;
-    private static final Color DEFAULT_COLOR = Color.web("#009ee0");
-    private static final Color DEFAULT_TEXT_COLOR = Color.web("#ffffff");
-    private static MainMenuController instance;
+    /**
+     * Returns the singleton instance of the MainMenuController.
+     *
+     * @return The singleton instance of the MainMenuController
+     */
     public static MainMenuController getInstance() {
         if (instance == null) {
             instance = new MainMenuController();
         }
         return instance;
     }
+
+    /**
+     * Handles the Internet button action.
+     * Switch to the Internet scene.
+     * @param event The action event
+     */
     @FXML
     private void handleInternetButton(ActionEvent event) {
         switchScene(event, SceneType.INTERNET);
     }
 
+    /**
+     * Handles the Report button action.
+     * Switch to the Report scene.
+     * @param event The action event
+     */
     @FXML
     private void handleReportButton(ActionEvent event) {
         switchScene(event, SceneType.REPORT);
     }
 
+    /**
+     * Handles the Wellbeing Tips button action.
+     * Switch to the Wellbeing Tips scene.
+     * @param event The action event
+     */
     @FXML
     private void handleWebeButton(ActionEvent event) {
         switchScene(event, SceneType.WEBE);
     }
 
+    /**
+     * Handles the User Profile button action.
+     * Switch to the User Profile scene.
+     * @param event The action event
+     */
     @FXML
     private void handleUserProfileButton(ActionEvent event) {
         switchScene(event, SceneType.USER_PROFILE);
     }
 
+    /**
+     * Handles the Setting button action.
+     * Switch to the Setting scene.
+     * @param event The action event
+     */
     @FXML
     private void handleUserSettingButton(ActionEvent event) {
         switchScene(event, SceneType.SETTING);
     }
 
+    /**
+     * Handles the Contact button action.
+     * Switch to the Contact scene.
+     * @param event The action event
+     */
     @FXML
     private void handleContactButton(ActionEvent event) {
         switchScene(event, SceneType.CONTACT);
     }
 
+    /**
+     * Initializes the main menu.
+     */
     private void loadRemainingTime() {
         String query = "SELECT LimitType, LimitValue, Active, RemainingTime FROM Limits WHERE UserID = ?";
         try (Connection conn = dbConnection.getConnection();
@@ -121,6 +175,10 @@ public class MainMenuController {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Loads the time limits from the database.
+     */
     private void loadTimeLimits() {
         String query = "SELECT LimitType, LimitValue, Active FROM Limits WHERE UserID = ?";
         try (Connection conn = dbConnection.getConnection();
@@ -152,6 +210,10 @@ public class MainMenuController {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Pauses the countdown timer.
+     */
     private void pauseCountdownTimer() {
         if (countdown != null) {
             remainingTime = totalSeconds;
@@ -162,6 +224,11 @@ public class MainMenuController {
             notificationTimeline.stop();
         }
     }
+
+    /**
+     * Updates the remaining time in the database.
+     * @param remainingTime The remaining time in seconds
+     */
     private void updateRemainingTimeInDatabase(int remainingTime) {
         String updateQuery = "UPDATE Limits SET RemainingTime = ? WHERE UserID = ?";
         try (Connection conn = dbConnection.getConnection();
@@ -173,10 +240,17 @@ public class MainMenuController {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Resumes the countdown timer.
+     */
     private void resumeCountdownTimer() {
         startCountdownTimer(remainingTime, active);
     }
 
+    /**
+     * Stops the countdown timer.
+     */
     private void stopCountdownTimer() {
         if (countdown != null) {
             countdown.stop();
@@ -188,6 +262,11 @@ public class MainMenuController {
         }
     }
 
+    /**
+     * Starts the countdown timer.
+     * @param initialTotalSeconds The initial total seconds
+     * @param active Whether the timer is active
+     */
     private void startCountdownTimer(int initialTotalSeconds, boolean active) {
         if (!active) {
             return;
@@ -213,6 +292,9 @@ public class MainMenuController {
         countdown.play();
     }
 
+    /**
+     * Shows a notification.
+     */
     private void showNotification() {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -226,6 +308,9 @@ public class MainMenuController {
         });
     }
 
+    /**
+     * Starts the notification timer.
+     */
     private void startNotificationTimer() {
         if (notificationTimeline != null) {
             notificationTimeline.stop();
@@ -235,6 +320,9 @@ public class MainMenuController {
         notificationTimeline.play();
     }
 
+    /**
+     * Shows an ask dialog.
+     */
     private void showAskDialog() {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -250,7 +338,7 @@ public class MainMenuController {
 
             alert.showAndWait().ifPresent(response -> {
                 if (response == delayButton) {
-                    startCountdownTimer(10, true); // Delay for 5 minutes (300 seconds)
+                    startCountdownTimer(300, true); // Delay for 5 minutes (300 seconds)
                 } else if (response == delayButton2) {
                     startCountdownTimer(900, true); // Delay for 15 minutes (900 seconds)
                 } else if (response == delayButton3) {
@@ -262,7 +350,11 @@ public class MainMenuController {
         });
     }
 
-
+    /**
+     * Sets the user ID.
+     * @param userId The user ID
+     * @param source The source
+     */
     public void setUserId(int userId, String source) {
         this.userId = userId;
         if (this.firstName == null) {
@@ -276,20 +368,37 @@ public class MainMenuController {
         applyModeColors();
         loadSavedColors();
         AppSettings.loadModeFromDatabase(userId);
-        // Load the time limits from the database
+
+        // When Main Menu is loaded from login page or from setTimeLimits page by saving the time, load the time limits
+        // else load the remaining time
         if ("login".equals(source) || "saveSetTime".equals(source)) {
             loadTimeLimits();
         } else {
             loadRemainingTime();
         }
     }
+
+    /**
+     * Sets the first name.
+     * @param firstName The first name
+     */
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
+
+    /**
+     * Displays the user's name.
+     * @param firstName The first name
+     */
     public void displayName(String firstName) {
         lblName.setText(firstName + ", wish you are having a bright day!");
     }
 
+    /**
+     * Fetches the first name from the database.
+     * @param userId The user ID
+     * @return The first name
+     */
     private String fetchFirstNameFromDatabase(int userId) {
         String query = "SELECT firstName FROM useraccount WHERE userId = ?";
         try (Connection conn = new DataBaseConnection().getConnection();
@@ -304,6 +413,12 @@ public class MainMenuController {
         }
         return "Admin"; // Default value if the user is not found
     }
+
+    /**
+     * Fetches the account type from the database.
+     * @param userId The user ID
+     * @return The account type
+     */
     private String fetchAccTypeFromDatabase(int userId) {
         String query = "SELECT accType FROM useraccount WHERE userId = ?";
         try (Connection conn = new DataBaseConnection().getConnection();
@@ -319,17 +434,64 @@ public class MainMenuController {
         return "Admin"; // Default value if the user is not found
     }
 
+    /**
+     * Sets the account type.
+     * @param accType The account type
+     */
     public void setAccType(String accType) {
         this.accType = accType;
     }
+
+    /**
+     * Sets the account type to main.
+     * @param accType The account type
+     */
     public void setAccTypeToMain(String accType) {
         this.accType = accType;
     }
 
+    /**
+     * Represents the scene type.
+     * The scene type can be INTERNET, REPORT, WEBE, USER_PROFILE, SETTING, or CONTACT.
+     * The scene type is used to switch the scene.
+     */
     public enum SceneType {
-        INTERNET, REPORT, WEBE, USER_PROFILE, SETTING, CONTACT
+        /**
+         * Represents the internet scene type.
+         */
+        INTERNET,
+
+        /**
+         * Represents the report scene type.
+         */
+        REPORT,
+
+        /**
+         * Represents the web environment scene type.
+         */
+        WEBE,
+
+        /**
+         * Represents the user profile scene type.
+         */
+        USER_PROFILE,
+
+        /**
+         * Represents the setting scene type.
+         */
+        SETTING,
+
+        /**
+         * Represents the contact scene type.
+         */
+        CONTACT
     }
 
+    /**
+     * Switches the scene.
+     * @param event The action event
+     * @param sceneType The scene type
+     */
     public void switchScene(ActionEvent event, SceneType sceneType) {
         String fxmlFile = "";
         String title = "Explorer";
@@ -350,17 +512,17 @@ public class MainMenuController {
             case SETTING:
                 fxmlFile = "/com/cab302/wellbeing/Setting.fxml";
                 break;
-            case CONTACT:
+            case CONTACT: // Default to Contact.fxml, but for Developer, switch to DeveloperPage.fxml
                 fxmlFile = "/com/cab302/wellbeing/Contact.fxml";
                 if ("Developer".equals(accType)) {
                     fxmlFile = "/com/cab302/wellbeing/DeveloperPage.fxml";
                 }
                 break;
             default:
-                System.err.println("Unsupported scene type: " + sceneType);
+                System.err.println("Unsupported scene type: " + sceneType); // Unsupported scene type
                 return;
         }
-
+        // Load the scene
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(fxmlFile));
             Parent root = fxmlLoader.load();
@@ -446,6 +608,7 @@ public class MainMenuController {
             System.err.println("Error loading " + fxmlFile + ": " + e.getMessage());
             e.printStackTrace();
         }
+        // Pause the countdown timer if the Setting scene is opened
         if (sceneType == SceneType.SETTING) {
             if (sceneType == SceneType.SETTING) {
                 pauseCountdownTimer();
@@ -457,18 +620,32 @@ public class MainMenuController {
         }
     }
 
+    /**
+     * Creates an alert.
+     * @param alertType The alert type
+     * @param title The title
+     * @param header The header
+     * @param content The content
+     * @return The alert
+     */
     protected Alert createAlert(Alert.AlertType alertType, String title, String header, String content) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setHeaderText(header);
-        alert.setContentText(content);
+        Alert alert = new Alert(alertType); // Create an alert
+        alert.setTitle(title); // Set the title
+        alert.setHeaderText(header); // Set the header
+        alert.setContentText(content); // Set the content
         return alert;
     }
 
+    /**
+     * Handles the Log Out button action.
+     * Logs out the user and displays the login page.
+     * @param e The action event
+     */
     public void btnLogOutOnAction(ActionEvent e) {
-        stopCountdownTimer();
-        Alert alert = createAlert(Alert.AlertType.CONFIRMATION, "Logout Confirmation", "Logging out", "Are you sure you want to log out?");
-        Optional<ButtonType> result = alert.showAndWait();
+        stopCountdownTimer(); // Stop the countdown timer
+        Alert alert = createAlert(Alert.AlertType.CONFIRMATION, "Logout Confirmation", "Logging out", "Are you sure you want to log out?"); // Create a confirmation alert
+        Optional<ButtonType> result = alert.showAndWait(); // Show the alert and wait for the user's response
+        // If the user confirms the log out
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
                 // Close the current window
@@ -476,7 +653,7 @@ public class MainMenuController {
                 stage.close();
 
                 // Load and display the login page
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/cab302/wellbeing/login.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/cab302/wellbeing/Login.fxml"));
                 Parent root = loader.load();
                 Stage loginStage = new Stage();
                 loginStage.setTitle("Login");
@@ -489,10 +666,16 @@ public class MainMenuController {
         }
     }
 
+    /**
+     * Applies the color themes.
+     * @param backgroundColor The background color
+     * @param textColor The text color
+     * @param buttonColor The button color
+     */
     public void applyColors(Color backgroundColor, Color textColor, Color buttonColor) {
-        String backgroundHex = getHexColor(backgroundColor);
-        String textHex = getHexColor(textColor);
-        String buttonHex = getHexColor(buttonColor);
+        String backgroundHex = getHexColor(backgroundColor);  // Convert the background color to a hex color string
+        String textHex = getHexColor(textColor); // Convert the text color to a hex color string
+        String buttonHex = getHexColor(buttonColor); // Convert the button color to a hex color string
 
         if (paneMenu != null) {
             paneMenu.setStyle("-fx-background-color: " + backgroundHex + ";");
@@ -523,17 +706,27 @@ public class MainMenuController {
         }
     }
 
+    /**
+     * Converts a Color object to a hex color string.
+     * @param color The Color object
+     * @return The hex color string
+     */
     private String getHexColor(Color color) {
         return String.format("#%02x%02x%02x", (int) (color.getRed() * 255),
-                (int) (color.getGreen() * 255), (int) (color.getBlue() * 255));
+                (int) (color.getGreen() * 255), (int) (color.getBlue() * 255)); // Return the hex color string
     }
 
+    /**
+     * Loads the saved colors from the database.
+     */
     private void loadSavedColors() {
+        // Check if the database connection is null
         if (dbConnection == null) {
             System.err.println("Database connection is null.");
             return;
         }
-        String query = "SELECT BackgroundColor, TextColor, ButtonColor, ButtonTextColor FROM ColorSettings WHERE UserID = ?";
+        String query = "SELECT BackgroundColor, TextColor, ButtonColor, ButtonTextColor FROM ColorSettings WHERE UserID = ?"; // SQL query to select the colors
+        // Try to connect to the database and execute the query
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement statement = conn.prepareStatement(query)) {
             statement.setInt(1, userId);
@@ -557,32 +750,41 @@ public class MainMenuController {
         }
     }
 
-    private void closeCurrentWindow() {
-        Stage stage = (Stage) btnLogOut.getScene().getWindow();
-        stage.close();
-    }
-
+    /**
+     * Applies the color theme based on the current mode.
+     */
     public void applyModeColors() {
+        // Check if the background label is null
         if (lblBkGrd == null) {
             System.out.println("lblBkGrd is null!");
             return;
         }
 
-        String currentMode = AppSettings.getCurrentMode();
+        String currentMode = AppSettings.getCurrentMode(); // Get the current mode
         double opacity = AppSettings.MODE_AUTO.equals(currentMode) ? 0.0 : 0.5; // 0% for auto, 70% for others
 
         updateLabelBackgroundColor(opacity);
     }
 
+    /**
+     * Updates the background color of the label.
+     * @param opacity The opacity of the color
+     */
     public void updateLabelBackgroundColor(double opacity) {
+        // Check if the background label is null
         if (lblBkGrd == null) {
             System.out.println("lblBkGrd is null!");
             return;
         }
-        Color backgroundColor = AppSettings.getCurrentModeColorWithOpacity(opacity);
-        lblBkGrd.setStyle("-fx-background-color: " + toRgbaColor(backgroundColor) + ";");
+        Color backgroundColor = AppSettings.getCurrentModeColorWithOpacity(opacity); // Get the current mode color with the specified opacity
+        lblBkGrd.setStyle("-fx-background-color: " + toRgbaColor(backgroundColor) + ";"); // Set the background color of the label
     }
 
+    /**
+     * Converts a Color object to an RGBA color string.
+     * @param color The Color object
+     * @return The RGBA color string
+     */
     private String toRgbaColor(Color color) {
         return String.format("rgba(%d, %d, %d, %.2f)",
                 (int) (color.getRed() * 255),

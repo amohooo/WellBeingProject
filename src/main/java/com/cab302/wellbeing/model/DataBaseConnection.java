@@ -1,33 +1,55 @@
 package com.cab302.wellbeing.model;
 
-import javafx.scene.paint.Color;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.*;
 
+/**
+ * This class is used to manage the database connection and operations.
+ * It provides methods to create the database, tables, and insert data.
+ * It also provides utility methods to hash passwords.
+ * It is a singleton class to ensure only one connection is established.
+ * It uses environment variables for database connection settings.
+ * It uses BCrypt for password hashing.
+ * It uses prepared statements for SQL queries.
+ * It uses transactions for data integrity.
+ * It uses foreign keys for data integrity.
+ * It uses enums for data validation.
+ * It uses unique constraints for data integrity.
+ * It uses a singleton pattern for the database connection.
+ */
 public class DataBaseConnection {
     // Default local development settings
-    private static final String DATABASE_URL = "jdbc:mysql://127.0.0.1:3306/";
-    private static final String DATABASE_NAME = "WellBeing";
-    private static final String DATABASE_USER = "cab302";
-    private static final String DATABASE_PASSWORD = "cab302";
-
+    private static final String DATABASE_URL = "jdbc:mysql://127.0.0.1:3306/"; // Localhost
+    private static final String DATABASE_NAME = "WellBeing"; // Database name
+    private static final String DATABASE_USER = "cab302"; // Database user
+    private static final String DATABASE_PASSWORD = "cab302"; // Database password
     // Environment variable fallback settings
-    private static final String ENV_DATABASE_URL = System.getenv("DB_URL");
-    private static final String ENV_DATABASE_USER = System.getenv("DB_USER");
-    private static final String ENV_DATABASE_PASSWORD = System.getenv("DB_PASS");
-    public Connection databaseLink;
+    private static final String ENV_DATABASE_URL = System.getenv("DB_URL"); // Database URL
+    private static final String ENV_DATABASE_USER = System.getenv("DB_USER"); // Database user
+    private static final String ENV_DATABASE_PASSWORD = System.getenv("DB_PASS"); // Database password
+    /**
+     * The singleton instance of the database connection.
+     */
+    public Connection databaseLink; // The database connection
+    private static DataBaseConnection instance; // The singleton instance
 
-    private static DataBaseConnection instance;
-
+    /**
+     * This method is used to get the singleton instance of the database connection.
+     * @return the database connection instance
+     */
     public static DataBaseConnection getInstance() {
         if (instance == null) {
-            instance = new DataBaseConnection();
+            instance = new DataBaseConnection(); // Create a new instance if it doesn't exist
         }
         return instance;
     }
 
+    /**
+     * This method is used to create the database if it doesn't exist.
+     */
     public void createDatabase() {
+        // Use try-with-resources to ensure the connection is closed
         try (Connection conn = DriverManager.getConnection(DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD);
              Statement stmt = conn.createStatement()) {
             stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS " + DATABASE_NAME);
@@ -38,11 +60,16 @@ public class DataBaseConnection {
         }
     }
 
+    /**
+     * This method is used to get the database connection.
+     * It uses environment variables if set, otherwise uses default settings.
+     * @return the database connection
+     */
     public Connection getConnection() {
-        String databaseUrl = (ENV_DATABASE_URL != null) ? ENV_DATABASE_URL : DATABASE_URL + DATABASE_NAME;
-        String databaseUser = (ENV_DATABASE_USER != null) ? ENV_DATABASE_USER : DATABASE_USER;
-        String databasePass = (ENV_DATABASE_PASSWORD != null) ? ENV_DATABASE_PASSWORD : DATABASE_PASSWORD;
-
+        String databaseUrl = (ENV_DATABASE_URL != null) ? ENV_DATABASE_URL : DATABASE_URL + DATABASE_NAME; // Append database name
+        String databaseUser = (ENV_DATABASE_USER != null) ? ENV_DATABASE_USER : DATABASE_USER; // Use environment variable if set
+        String databasePass = (ENV_DATABASE_PASSWORD != null) ? ENV_DATABASE_PASSWORD : DATABASE_PASSWORD; // Use environment variable if set
+        // Use try-with-resources to ensure the connection is closed
         try {
             if (databaseLink == null || databaseLink.isClosed() || !databaseLink.isValid(5)) {
                 createDatabase(); // Ensure the database is created first
@@ -55,7 +82,11 @@ public class DataBaseConnection {
         return databaseLink;
     }
 
+    /**
+     * This method is used to create the tables in the database.
+     */
     public void createTables() {
+        // Use try-with-resources to ensure the statement is closed
         try (Statement statement = getConnection().createStatement()) {
             executeTableCreation(statement);
         } catch (SQLException e) {
@@ -63,6 +94,10 @@ public class DataBaseConnection {
             e.printStackTrace();
         }
     }
+
+    /**
+     * This method is used to insert the default color settings.
+     */
     private void executeTableCreation(Statement statement) throws SQLException {
         // Existing tables
         // Create the UserAccount table
@@ -165,6 +200,11 @@ public class DataBaseConnection {
         createMediaFilesTable(statement);
 
     }
+
+    /**
+     * This method is used to create the MediaFiles table.
+     * @param statement - the statement to execute the query
+     */
     private void createMediaFilesTable(Statement statement) throws SQLException {
         String createMediaFilesTableQuery = "CREATE TABLE IF NOT EXISTS MediaFiles ("
                 + "FileID INT AUTO_INCREMENT PRIMARY KEY, "
@@ -181,6 +221,10 @@ public class DataBaseConnection {
                 + ")";
         statement.executeUpdate(createMediaFilesTableQuery);
     }
+
+    /**
+     * This method is used to insert the default user.
+     */
     public void insertUser() {
         String userName = "cab302";
         String firstName = "cab302";
@@ -215,7 +259,6 @@ public class DataBaseConnection {
             e.printStackTrace();
             return; // Exit the method in case of error
         }
-
         String query = "INSERT INTO useraccount (userName, firstName, lastName, passwordHash, emailAddress, QuestionID_1, QuestionID_2, Answer_1, Answer_2, RegistrationCode, accType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = getConnection().prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, userName);
@@ -250,6 +293,10 @@ public class DataBaseConnection {
             }
         }
     }
+
+    /**
+     * This method is used to insert the default Registration Code.
+     */
     public void insertRegistrationCode() {
         String Code = "cab302";
 
@@ -294,6 +341,11 @@ public class DataBaseConnection {
         }
     }
 
+    /**
+     * This method is used to get the first question ID from the specified table.
+     * @param tableName - the table name to retrieve the question ID from
+     * @return the first question ID
+     */
     private int getFirstQuestionID(String tableName) {
         // Determine the correct column name based on the table name
         String columnID = tableName.equals("PwdQuestions1") ? "QuestionID_1" : "QuestionID_2";
@@ -313,6 +365,9 @@ public class DataBaseConnection {
         }
     }
 
+    /**
+     * This method is used to insert the default Questions.
+     */
     public void insertQuestions() {
         String[] questions = {
                 "What is the last name of your favourite high school teacher?",
@@ -346,6 +401,9 @@ public class DataBaseConnection {
         }
     }
 
+    /**
+     * This method is used to insert the default Questions.
+     */
     public void insertQuestions2() {
         String[] questions = {
                 "What is your mother’s maiden name?",
@@ -380,11 +438,19 @@ public class DataBaseConnection {
         }
     }
 
+    /**
+     * This method is used to hash a password.
+     * @param password - the password to hash
+     * @return the hashed password
+     */
 
-    // Utility method to hash a password
     public String hashPassword(String password) {
-        return BCrypt.hashpw(password, BCrypt.gensalt());
+        return BCrypt.hashpw(password, BCrypt.gensalt()); // Utility method to hash a password
     }
+
+    /**
+     * This method is used to execute.
+     */
     public void initializeAndInsertUser() {
         getConnection();  // Establish connection and ensure the database and table are set up
         createTables();
@@ -392,6 +458,5 @@ public class DataBaseConnection {
         insertQuestions2();
         insertUser();
         insertRegistrationCode();
-        //insertDefaultColorSettings();
     }
 }

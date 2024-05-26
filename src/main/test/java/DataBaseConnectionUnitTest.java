@@ -114,7 +114,7 @@ class DataBaseConnectionUnitTest {
         try (Statement statement = dbConnection.getConnection().createStatement();
              ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) FROM useraccount")) {
             assertTrue(resultSet.next());
-            assertEquals(1, resultSet.getInt(1));
+            assertEquals(2, resultSet.getInt(1));
         } catch (SQLException e) {
             e.printStackTrace();
         }

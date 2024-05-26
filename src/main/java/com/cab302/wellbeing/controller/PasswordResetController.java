@@ -17,31 +17,35 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * This class is responsible for controlling the password reset functionality.
+ * It provides functionalities such as verifying answers and resetting the password.
+ */
 public class PasswordResetController {
+    /**
+     * Test field for email address, security answer 1, security answer 2.
+     */
     @FXML
-    public TextField txtEmailAdd;
+    public TextField txtEmailAdd, txtAn1, txtAn2; // Text field for email address
+    /**
+     * Test field for new password, re-enter new password.
+     */
     @FXML
-    public TextField txtAn1;
+    public PasswordField ptxtPwd, ptxtRePwd; // Password field for new password
+    /**
+     * Label for the message, verification, question 1, question 2.
+     */
     @FXML
-    public TextField txtAn2;
+    public Label lblMsg, lblVerify, lblQ1, lblQ2; // Label for the message
+    /**
+     * Button for reset, cancel, verify.
+     */
     @FXML
-    public PasswordField ptxtPwd;
-    @FXML
-    public PasswordField ptxtRePwd;
-    @FXML
-    public Label lblMsg;
-    @FXML
-    public Label lblVerify;
-    @FXML
-    public Label lblQ1;
-    @FXML
-    public Label lblQ2;
-    @FXML
-    public Button btnReset;
-    @FXML
-    public Button btnCncl;
-    @FXML
-    public Button btnVerify;
+    public Button btnReset, btnCncl, btnVerify;
+
+    /**
+     * Initializes the controller.
+     */
     @FXML
     private void initialize() {
         // Disable the reset button initially until answers are verified
@@ -58,13 +62,18 @@ public class PasswordResetController {
             }
         });
     }
+
+    /**
+     * This method is used to display the security questions.
+     */
     public void displayQuestions() {
-        String email = txtEmailAdd.getText().trim();
+        String email = txtEmailAdd.getText().trim(); // Trim to remove leading/trailing spaces
+        // Check if email is empty
         if (email.isEmpty()) {
             lblMsg.setText("Please enter your email address.");
             return;
         }
-
+        // Fetch the questions from the database
         try {
             DataBaseConnection connectNow = new DataBaseConnection();
             Connection connectDB = connectNow.getConnection();
@@ -88,7 +97,15 @@ public class PasswordResetController {
         }
     }
 
+    /**
+     * This method is used to get the question by ID.
+     * @param questionID - the ID of the question
+     * @param tableName - the name of the table
+     * @param connectDB - the database connection
+     * @return the question
+     */
     private String getQuestionByID(int questionID, String tableName, Connection connectDB) {
+        // Fetch the question from the database
         try {
             String questionColumn = tableName.equals("PwdQuestions1") ? "Question_1" : "Question_2";
             String idColumn = tableName.equals("PwdQuestions1") ? "QuestionID_1" : "QuestionID_2";
@@ -108,16 +125,19 @@ public class PasswordResetController {
         return "Question not found";
     }
 
+    /**
+     * This method is used to verify the answers.
+     */
     public void verifyAnswers() {
-        String email = txtEmailAdd.getText();
-        String answer1 = txtAn1.getText();
-        String answer2 = txtAn2.getText();
-
+        String email = txtEmailAdd.getText(); // Get the email address
+        String answer1 = txtAn1.getText(); // Get the answer 1
+        String answer2 = txtAn2.getText(); // Get the answer 2
+        // Check if any field is empty
         if (email.isEmpty() || answer1.isEmpty() || answer2.isEmpty()) {
             lblVerify.setText("Please fill in all fields for verification.");
             return;
         }
-
+        // Verify the answers
         try {
             DataBaseConnection connectNow = new DataBaseConnection();
             Connection connectDB = connectNow.getConnection();
@@ -144,21 +164,26 @@ public class PasswordResetController {
             lblVerify.setText("Error verifying answers: " + e.getMessage());
         }
     }
-    public void resetPassword() {
-        String email = txtEmailAdd.getText();
-        String newPassword = ptxtPwd.getText();
 
+    /**
+     * This method is used to reset the password.
+     */
+    public void resetPassword() {
+        String email = txtEmailAdd.getText(); // Get the email address
+        String newPassword = ptxtPwd.getText(); // Get the new password
+        // Check if any field is empty
         if (email.isEmpty() || newPassword.isEmpty() || ptxtRePwd.getText().isEmpty()) {
             lblMsg.setText("Please fill in all fields.");
             return;
         }
-
+        // Check if passwords match
         if (!newPassword.equals(ptxtRePwd.getText())) {
             lblMsg.setText("Passwords do not match.");
             return;
         }
-
-        if (!btnReset.isDisabled()) { // Check if reset is allowed after verification
+        // Check if reset is allowed after verification
+        if (!btnReset.isDisabled()) {
+            // Reset the password
             try {
                 DataBaseConnection connectNow = new DataBaseConnection();
                 Connection connectDB = connectNow.getConnection();
@@ -187,12 +212,22 @@ public class PasswordResetController {
             lblMsg.setText("Please verify your answers before resetting your password.");
         }
     }
+
+    /**
+     * This method is used to close the window.
+     */
     private void closeWindow() {
-        // You can use any FXML component here to get the scene and window. Using lblMsg as an example.
+        // get the scene and window.
         Stage stage = (Stage) lblMsg.getScene().getWindow();
         stage.close();  // Closes the current window
     }
 
+    /**
+     * This method is used to check if the email exists.
+     * @param email - the email address
+     * @param connectDB - the database connection
+     * @return true if the email exists, false otherwise
+     */
     private boolean emailExists(String email, Connection connectDB) {
         try {
             PreparedStatement pst = connectDB.prepareStatement("SELECT COUNT(*) FROM useraccount WHERE emailAddress = ?");
@@ -208,6 +243,10 @@ public class PasswordResetController {
         return false;
     }
 
+    /**
+     * This method is used to cancel the password reset.
+     * @param e - the action event that triggered the cancel
+     */
     public void btnExitOnAction(ActionEvent e) {
         closeWindow();
     }

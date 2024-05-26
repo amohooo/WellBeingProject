@@ -11,20 +11,32 @@ import javafx.stage.Stage;
  */
 public class UserAgreementController {
     @FXML
-    Button btnAgree;
+    Button btnAgree; // Button to agree to the user agreement
     @FXML
-    Button btnCanc;
-    private CheckBox registerCheckbox;
+    Button btnCanc; // Button to cancel the user agreement
+    private CheckBox registerCheckbox; // Checkbox to register the user agreement
 
+    /**
+     * This method is used to set the checkbox to register the user agreement.
+     * @param registerCheckbox - the checkbox to register the user agreement
+     */
     public void setRegisterCheckbox(CheckBox registerCheckbox) {
         this.registerCheckbox = registerCheckbox;
-    }
+    } // Set the checkbox to register the user agreement
+
+    /**
+     * This method is used to initialize the user agreement controller.
+     */
     @FXML
     public void initialize() {
         btnAgree.setOnAction(e -> agreeAndClose());
         btnCanc.setOnAction(e -> closeWindow());
     }
 
+    /**
+     * This method is used to handle the agree button click event.
+     * It sets the checkbox to selected and closes the current stage.
+     */
     private void agreeAndClose() {
         if (registerCheckbox != null) {
             registerCheckbox.setSelected(true);
@@ -33,6 +45,10 @@ public class UserAgreementController {
         stage.close();
     }
 
+    /**
+     * This method is used to handle the cancel button click event.
+     * It closes the current stage.
+     */
     private void closeWindow() {
         if (registerCheckbox != null) {
             registerCheckbox.setSelected(false);

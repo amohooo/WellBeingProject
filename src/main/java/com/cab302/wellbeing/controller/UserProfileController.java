@@ -19,26 +19,55 @@ import java.sql.SQLException;
  * It provides methods to handle the user profile (name, email, password, etc.) of the application.
  */
 public class UserProfileController {
+    /**
+     * Text field for username, first name, last name, email, password, answer 1, answer 2.
+     */
     @FXML
-    public TextField txtUserName, txtFirstName, txtLastName, txtEmail, txtPassword,txtA1, txtA2;
+    public TextField txtUserName, txtFirstName, txtLastName, txtEmail, txtPassword,txtA1, txtA2; // Text fields for user profile
+    /**
+     * Toggle group for account type.
+     */
     @FXML
-    public ToggleGroup accTypeGroup;
+    public ToggleGroup accTypeGroup; // Toggle group for account type
+    /**
+     * Choice box for security questions.
+     */
     @FXML
-    public ChoiceBox<String> chbQ1, chbQ2;
+    public ChoiceBox<String> chbQ1, chbQ2; // Choice boxes for security questions
+    /**
+     * Button for cancel, save, verify.
+     */
     @FXML
-    public Button btnCancel, btnSave, btnVerify;
+    public Button btnCancel, btnSave, btnVerify; // Buttons for user profile
+    /**
+     * Radio button for admin, general, developer.
+     */
     @FXML
-    public RadioButton radbAdm, radbGen, radbDev;
+    public RadioButton radbAdm, radbGen, radbDev; // Radio buttons for account type
+    /**
+     * Label for background, message, user profile, user, first name, last name, email, password, account type, security question 1, security question 2, answer 1, answer 2.
+     */
     @FXML
-    public Label lblBkGrd, lblMsg, lblUserPro, lblUser, lblFirst, lblLast, lblEmail, lblPwd, lblAccType, lblSQ1, lblSQ2, lblAn1, lblAn2;
+    public Label lblBkGrd, lblMsg, lblUserPro, lblUser, lblFirst, lblLast, lblEmail, lblPwd, lblAccType, lblSQ1, lblSQ2, lblAn1, lblAn2; // Labels for user profile
+    /**
+     * Pane for user profile.
+     */
     @FXML
-    private Pane paneProfile;
-    private static Color lightColor = Color.web("#bfe7f7");
-    private static Color nightColor = Color.web("#777777");
-    private static Color autoColor = Color.web("#009ee0");
-    private static Color eyeProtectColor = Color.web("#A3CCBE");
-    int userId;
-    private String accType;
+    private Pane paneProfile; // Pane for user profile
+    private static Color lightColor = Color.web("#bfe7f7"); // Light color
+    private static Color nightColor = Color.web("#777777"); // Night color
+    private static Color autoColor = Color.web("#009ee0"); // Auto color
+    private static Color eyeProtectColor = Color.web("#A3CCBE"); // Eye protect color
+    /**
+     * This method is used to set the user id.
+     */
+    int userId; // User ID
+    private String accType; // Account type
+
+    /**
+     * This method is used to set and parse the current user's account type.
+     * @param accType - user's account type
+     */
     public void setUserType(String accType) {
         this.accType = accType;
         System.out.println("User Type: " + accType);
@@ -55,25 +84,20 @@ public class UserProfileController {
             txtUserName.setDisable(true);
         }
     }
-    private String fetchAccTypeFromDatabase(int userId) {
-        String query = "SELECT accType FROM useraccount WHERE userId = ?";
-        try (Connection conn = new DataBaseConnection().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setInt(1, userId);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getString("accType");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return "Admin"; // Default value if the user is not found
-    }
-    private DataBaseConnection dbConnection = new DataBaseConnection();
 
+    private DataBaseConnection dbConnection = new DataBaseConnection(); // Database connection
+
+    /**
+     * This method is used to set the user ID.
+     * @param userId - the user ID
+     */
     public void setUserId(int userId) {
         this.userId = userId;  // Now you can use this userId to store browsing data linked to the user
     }
+
+    /**
+     * This method is used to initialize the user profile controller.
+     */
     @FXML
     private void initialize() {
         // Disable the reset button initially until answers are verified
@@ -81,24 +105,39 @@ public class UserProfileController {
 
         lblMsg.setText("");
     }
-
+    /**
+     * This method is used to display the user name.
+     * @param userName - the user name
+     */
     public void displayUserName(String userName){
         this.txtUserName.setText(userName);
-    }
-
+    } // Display the user name
+    /**
+     * This method is used to display the first name.
+     * @param firstName - the first name
+     */
     public void displayFirstName(String firstName){
         this.txtFirstName.setText(firstName);
-    }
-
+    } // Display the first name
+    /**
+     * This method is used to display the last name.
+     * @param lastName - the last name
+     */
     public void displayLastName(String lastName){
         this.txtLastName.setText(lastName);
-    }
-
+    } // Display the last name
+    /**
+     * This method is used to display the email.
+     * @param email - the email
+     */
     public void displayEmail(String email){
         this.txtEmail.setText(email);
-    }
+    } // Display the email
 
-
+    /**
+     * This method is used to display the account type.
+     * @param accType - the account type
+     */
     public void displayAccType(String accType){
         if("Developer".equals(accType)){
             this.radbDev.setSelected(true);
@@ -118,7 +157,11 @@ public class UserProfileController {
         }
     }
 
+    /**
+     * This method is used to display the user profile.
+     */
     public void displayUserProfile(){
+        // Display the user profile
         try {
             Connection conn = dbConnection.getConnection(); // Get a fresh connection
             String selectQuery = " SELECT userId, userName, emailAddress, firstName, lastName, passwordHash, accType,Question_1, Question_2, Answer_1, Answer_2  FROM WellBeing.useraccount " +
@@ -143,15 +186,16 @@ public class UserProfileController {
                 this.displayAccType(accType);
                 this.chbQ1.setValue(q1);
                 this.chbQ2.setValue(q2);
-
-
             }
-            } catch(SQLException e){
+        } catch(SQLException e){
                 System.out.println("SQL Exception: " + e.getMessage());
                 e.printStackTrace();
             }
-        }
+    }
 
+    /**
+     * This method is used to save the user profile.
+     */
     public void saveUserProfile(){
         if (!validateInputs()) {
             return; // Exit if inputs are not valid
@@ -180,11 +224,18 @@ public class UserProfileController {
             e.printStackTrace();
         }
     }
+
+    /**
+     * This method is used to cancel the user profile.
+     */
     public void cancelOnAction(){
         Stage stage = (Stage) txtUserName.getScene().getWindow();
         stage.close();  // Closes the current window
     }
 
+    /**
+     * This method is used to save the user profile.
+     */
     public void saveOnAction(){
         this.saveUserProfile();
         this.displayUserProfile();
@@ -192,6 +243,9 @@ public class UserProfileController {
         stage.close();  // Closes the current window
     }
 
+    /**
+     * This method is used to verify the answers for the user profile.
+     */
     private int getQuestionID(String question, String tableName, String questionColumn, String idColumn, Connection connectDB) {
         String query = "SELECT " + idColumn + " FROM " + tableName + " WHERE " + questionColumn + " = ?";
         try (PreparedStatement pstmt = connectDB.prepareStatement(query)) {
@@ -210,6 +264,9 @@ public class UserProfileController {
         }
     }
 
+    /**
+     * This method is used to verify the answers for the user profile.
+     */
     private boolean validateInputs() {
         if (txtFirstName.getText().isEmpty() || txtLastName.getText().isEmpty() || txtUserName.getText().isEmpty() || txtPassword.getText().isEmpty() ||
                 txtEmail.getText().isEmpty() || chbQ1.getSelectionModel().isEmpty() || chbQ2.getSelectionModel().isEmpty() ||
@@ -217,17 +274,17 @@ public class UserProfileController {
             lblMsg.setText("Please fill all the information above.");
             return false;
         }
-
+        // Check if email is valid
         if (!txtEmail.getText().contains("@")) {
             lblMsg.setText("Invalid email format.");
             return false;
         }
-
+        // Check if password is at least 8 characters long
         if (usernameExists(txtUserName.getText())) {
             lblMsg.setText("Username already exists. Please choose a different one.");
             return false;
         }
-
+        // Check if email already exists
         if (emailExists(txtEmail.getText())) {
             lblMsg.setText("Email address already exists. Please use a different one.");
             return false;
@@ -235,16 +292,20 @@ public class UserProfileController {
 
         return true;
     }
-    public void verifyAnswers() {
-        String email = txtEmail.getText();
-        String answer1 = txtA1.getText();
-        String answer2 = txtA2.getText();
 
+    /**
+     * This method is used to verify the answers for the user profile.
+     */
+    public void verifyAnswers() {
+        String email = txtEmail.getText(); // Get email
+        String answer1 = txtA1.getText(); // Get answer 1
+        String answer2 = txtA2.getText(); // Get answer 2
+        // Check if email, answer 1, and answer 2 are empty
         if (email.isEmpty() || answer1.isEmpty() || answer2.isEmpty()) {
             lblMsg.setText("Please fill in all fields for verification.");
             return;
         }
-
+        // Verify answers
         try {
             DataBaseConnection connectNow = new DataBaseConnection();
             Connection connectDB = connectNow.getConnection();
@@ -271,16 +332,34 @@ public class UserProfileController {
             lblMsg.setText("Error verifying answers: " + e.getMessage());
         }
     }
+
+    /**
+     * This method is used to check if the username exists.
+     * @param username - the username
+     * @return true if the username exists, false otherwise
+     */
     private boolean usernameExists(String username) {
         return exists("userName", username);
     }
 
+    /**
+     * This method is used to check if the email exists.
+     * @param email - the email
+     * @return true if the email exists, false otherwise
+     */
     private boolean emailExists(String email) {
         return exists("emailAddress", email);
     }
 
+    /**
+     * This method is used to check if the column value exists.
+     * @param columnName - the column name
+     * @param value - the value
+     * @return true if the column value exists, false otherwise
+     */
     private boolean exists(String columnName, String value) {
-        String query = "SELECT COUNT(*) FROM useraccount WHERE " + columnName + " = ? and userId != " + userId;
+        String query = "SELECT COUNT(*) FROM useraccount WHERE " + columnName + " = ? and userId != " + userId; // Check if the value exists in the database
+        // Check if the value exists in the database
         try (Connection connectDB = new DataBaseConnection().getConnection();
              PreparedStatement preparedStatement = connectDB.prepareStatement(query)) {
             preparedStatement.setString(1, value);
@@ -295,11 +374,20 @@ public class UserProfileController {
         return false;
     }
 
+    /**
+     * This method is used to load the questions.
+     */
     public void loadQuestions(){
         loadQuestionsToChoiceBox(chbQ1, "PwdQuestions1", "Question_1");
         loadQuestionsToChoiceBox(chbQ2, "PwdQuestions2", "Question_2");
     }
 
+    /**
+     * This method is used to load the questions to the choice box.
+     * @param choiceBox - the choice box
+     * @param tableName - the table name
+     * @param questionColumn - the question column
+     */
     private void loadQuestionsToChoiceBox(ChoiceBox<String> choiceBox, String tableName, String questionColumn) {
         String query = "SELECT " + questionColumn + " FROM " + tableName;
         try (Connection connectDB = new DataBaseConnection().getConnection();
@@ -313,6 +401,13 @@ public class UserProfileController {
             System.err.println("Error loading questions from " + tableName + ": " + e.getMessage());
         }
     }
+
+    /**
+     * This method is used to apply the colors.
+     * @param backgroundColor - the background color
+     * @param textColor - the text color
+     * @param buttonColor - the button color
+     */
     public void applyColors(Color backgroundColor, Color textColor, Color buttonColor) {
         String backgroundHex = getHexColor(backgroundColor);
         String textHex = getHexColor(textColor);
@@ -376,11 +471,20 @@ public class UserProfileController {
             lblAn2.setStyle(" -fx-text-fill: " + textHex + ";");
         }
     }
+
+    /**
+     * This method is used to get the hex color.
+     * @param color - the color
+     * @return the hex color
+     */
     private String getHexColor(Color color) {
         return String.format("#%02x%02x%02x", (int) (color.getRed() * 255),
                 (int) (color.getGreen() * 255), (int) (color.getBlue() * 255));
     }
 
+    /**
+     * This method is used to apply the mode colors.
+     */
     public void applyModeColors() {
         if (lblBkGrd == null) {
             System.out.println("lblBkGrd is null!");
@@ -393,6 +497,10 @@ public class UserProfileController {
         updateLabelBackgroundColor(opacity);
     }
 
+    /**
+     * This method is used to update the label background color.
+     * @param opacity - the opacity
+     */
     public void updateLabelBackgroundColor(double opacity) {
         if (lblBkGrd == null) {
             System.out.println("lblBkGrd is null!");
@@ -402,6 +510,11 @@ public class UserProfileController {
         lblBkGrd.setStyle("-fx-background-color: " + toRgbaColor(backgroundColor) + ";");
     }
 
+    /**
+     * This method is used to convert the color to RGBA.
+     * @param color - the color
+     * @return the RGBA color
+     */
     private String toRgbaColor(Color color) {
         return String.format("rgba(%d, %d, %d, %.2f)",
                 (int) (color.getRed() * 255),
@@ -410,3 +523,4 @@ public class UserProfileController {
                 color.getOpacity());
     }
 }
+
